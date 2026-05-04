@@ -1,0 +1,192 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Left Sidebar (Desktop) -->
+    <aside class="hidden lg:block lg:col-span-3 space-y-6">
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 sticky top-24">
+            {% if user.is_authenticated %}
+                <div class="text-center mb-6">
+                    {% if user.profile.profile_picture %}
+                        <img src="{{ user.profile.profile_picture.url }}" class="w-20 h-20 rounded-full mx-auto mb-4 border-2 border-primary-container object-cover">
+                    {% else %}
+                        <div class="w-20 h-20 rounded-full bg-primary-container flex items-center justify-center text-white text-3xl font-800 mx-auto mb-4">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                    <h2 class="font-sora font-700 text-xl text-white">{{ user.username }}</h2>
+                    <p class="text-sm text-gray-500">@{{ user.username|lower }}</p>
+                </div>
+                <div class="space-y-3">
+                    <a href="{% url 'create_post' %}" class="inline-flex items-center justify-center h-12 w-full bg-[#FF2D55] text-white rounded-xl text-[10px] font-800 uppercase tracking-widest hover:bg-[#FF2D55]/90 hover:shadow-[0_0_20px_rgba(255,45,85,0.3)] transition-all">
+                        <span class="material-symbols-outlined text-[20px] mr-2">add</span>
+                        New Post
+                    </a>
+                    <a href="{% url 'profile' %}" class="inline-flex items-center justify-center h-12 w-full bg-white/5 border border-white/10 text-gray-400 rounded-xl text-[10px] font-800 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all">
+                        <span class="material-symbols-outlined text-[20px] mr-2">person</span>
+                        My Profile
+                    </a>
+                </div>
+            {% else %}
+                <div class="text-center space-y-4">
+                    <p class="text-gray-400 text-sm">New to SkillMesh?</p>
+                    <a href="{% url 'register' %}" class="inline-flex items-center justify-center h-12 w-full bg-[#FF2D55] text-white rounded-xl text-[10px] font-800 uppercase tracking-widest hover:bg-[#FF2D55]/90 transition-all">Create Account</a>
+                    <a href="{% url 'login' %}" class="inline-flex items-center justify-center h-12 w-full bg-white/5 border border-white/10 text-gray-400 rounded-xl text-[10px] font-800 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all">Login</a>
+                </div>
+            {% endif %}
+
+            <div class="mt-8 pt-8 border-t border-gray-800">
+                <h3 class="text-xs font-600 text-gray-500 uppercase tracking-wider mb-4">Trending Skills</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-gray-800/50 border border-gray-700 rounded-full text-xs text-gray-300">#rust</span>
+                    <span class="px-3 py-1 bg-gray-800/50 border border-gray-700 rounded-full text-xs text-gray-300">#solidity</span>
+                    <span class="px-3 py-1 bg-gray-800/50 border border-gray-700 rounded-full text-xs text-gray-300">#distributed</span>
+                    <span class="px-3 py-1 bg-gray-800/50 border border-gray-700 rounded-full text-xs text-gray-300">#webgl</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Feed -->
+    <main class="lg:col-span-9 max-w-2xl mx-auto w-full space-y-6">
+        {% if not user.is_authenticated %}
+            <!-- Hero Section -->
+            <section class="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-3xl p-8 lg:p-12 mb-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary-container/10 blur-[100px] rounded-full"></div>
+                <div class="relative z-10">
+                    <h1 class="text-4xl lg:text-6xl font-sora font-800 text-white leading-tight mb-6 tracking-tighter">
+                        The Mesh of <span class="text-primary-container">Mastery</span>
+                    </h1>
+                    <p class="text-lg text-gray-400 mb-8 max-w-lg leading-relaxed">
+                        Join the elite network for technical builders. Showcase your projects, find high-stakes opportunities, and connect with the top 1% of talent.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="{% url 'register' %}" class="inline-flex items-center justify-center h-14 px-8 bg-[#FF2D55] text-white font-900 uppercase text-xs tracking-widest rounded-2xl hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(255,45,85,0.3)] transition-all">Start Your Journey</a>
+                        <a href="{% url 'search' %}" class="inline-flex items-center justify-center h-14 px-8 bg-white/5 border border-white/10 text-white font-900 uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all">Explore Talent</a>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+
+        <div class="flex items-center justify-between mb-2">
+            <h2 class="text-2xl font-sora font-700 text-white">Pulse Feed</h2>
+            <div class="flex bg-gray-900 border border-gray-800 rounded-full p-1">
+                <button class="px-4 py-1.5 bg-primary-container text-white rounded-full text-sm font-600">Latest</button>
+                <button class="px-4 py-1.5 text-gray-500 rounded-full text-sm font-600 hover:text-white transition-colors">Trending</button>
+            </div>
+        </div>
+
+        {% for post in posts %}
+            <article class="bg-gray-900/40 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-colors group animate-fade">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <a href="{% url 'profile' %}?username={{ post.user.username }}" class="relative">
+                            {% if post.user.profile.profile_picture %}
+                                <img src="{{ post.user.profile.profile_picture.url }}" class="w-12 h-12 rounded-full border border-gray-800 object-cover">
+                            {% else %}
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-white font-700">
+                                    {{ post.user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                            {% if post.post_type == 'open_to_work' %}
+                                <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-gray-900 rounded-full" title="Open to Work"></div>
+                            {% endif %}
+                        </a>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'profile' %}?username={{ post.user.username }}" class="font-600 text-white hover:text-primary-container transition-colors">{{ post.user.username }}</a>
+                                <a href="{% url 'send_message' post.user.username %}" class="text-gray-500 hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined text-sm">chat_bubble</span>
+                                </a>
+                            </div>
+                            <p class="text-xs text-gray-500">
+                                {{ post.created_at|timesince }} ago • 
+                                {% if post.post_type == 'hiring' %}
+                                    <span class="text-primary-container font-700 uppercase tracking-tighter">Hiring</span>
+                                {% elif post.post_type == 'open_to_work' %}
+                                    <span class="text-green-500 font-700 uppercase tracking-tighter">Open to Work</span>
+                                {% else %}
+                                    <span class="text-gray-500">General</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <button data-dropdown-toggle="post-menu-{{ post.id }}" class="text-gray-600 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-800">
+                            <span class="material-symbols-outlined">more_horiz</span>
+                        </button>
+                        
+                        <div id="post-menu-{{ post.id }}" class="dropdown-menu">
+                            {% if post.user == request.user %}
+                                <a href="{% url 'edit_post' post.id %}" class="dropdown-item">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                    Edit Signal
+                                </a>
+                                <a href="{% url 'delete_post' post.id %}" class="dropdown-item text-red-500" onclick="return confirm('Terminate this signal sequence?')">
+                                    <span class="material-symbols-outlined text-sm text-red-500">delete</span>
+                                    Terminate
+                                </a>
+                            {% else %}
+                                <a href="#" class="dropdown-item">
+                                    <span class="material-symbols-outlined text-sm">report</span>
+                                    Report Signal
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <span class="material-symbols-outlined text-sm">visibility_off</span>
+                                    Mute Node
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {% if post.post_type == 'hiring' %}
+                        <h3 class="text-xl font-sora font-700 text-white mb-2">Opportunity: Leads Needed</h3>
+                    {% endif %}
+                    <div class="text-gray-400 leading-relaxed prose prose-invert max-w-none">
+                        {{ post.content|linebreaks }}
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-6">
+                    {% for skill in post.related_skills.all %}
+                        <span class="px-3 py-1 bg-gray-800/80 border border-gray-700 rounded-full text-[10px] font-600 text-gray-400 uppercase tracking-wider hover:border-primary-container transition-colors cursor-default">
+                            #{{ skill.name }}
+                        </span>
+                    {% endfor %}
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-gray-800/50">
+                    <div class="flex gap-6">
+                        <button class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors group">
+                            <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">favorite</span>
+                            <span class="text-xs font-600">0</span>
+                        </button>
+                        <button class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors group">
+                            <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">comment</span>
+                            <span class="text-xs font-600">0</span>
+                        </button>
+                    </div>
+                    <button class="text-gray-500 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-xl">bookmark</span>
+                    </button>
+                </div>
+            </article>
+        {% empty %}
+            <div class="bg-gray-900/30 border border-gray-800 border-dashed rounded-3xl p-16 text-center">
+                <span class="material-symbols-outlined text-6xl text-gray-700 mb-4 block">cloud_off</span>
+                <h3 class="text-xl font-sora font-700 text-white mb-2">No active matches found</h3>
+                <p class="text-gray-500 mb-6 max-w-xs mx-auto">The mesh is currently quiet. Be the first to signal your intent.</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_post' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-container text-white rounded-xl font-600 hover:bg-primary-container/90 transition-colors">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                        Initialize Signal
+                    </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </main>
+</div>
+{% endblock content %}
+

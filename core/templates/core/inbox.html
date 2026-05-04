@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto animate-fade">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-sora font-800 text-white tracking-tighter uppercase">Messages</h1>
+        <div class="bg-gray-900 border border-gray-800 rounded-full px-4 py-1.5 text-xs font-700 text-gray-500">
+            {{ conversations|length }} Active Threads
+        </div>
+    </div>
+
+    <div class="bg-gray-900/50 border border-gray-800 rounded-3xl overflow-hidden backdrop-blur-sm">
+        <div class="p-6 border-b border-gray-800 bg-gray-900/30">
+            <div class="relative group">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary-container transition-colors">search</span>
+                <input type="text" class="w-full bg-black/50 border border-gray-800 rounded-xl pl-12 pr-4 py-3 text-white text-sm focus:outline-none focus:border-primary-container transition-all" placeholder="Search decrypted signals...">
+            </div>
+        </div>
+
+        <div class="divide-y divide-gray-800/50">
+            {% for conv in conversations %}
+                <a href="{% url 'send_message' conv.peer.username %}" class="flex items-center gap-4 p-6 hover:bg-white/5 transition-colors group">
+                    <div class="relative">
+                        {% if conv.peer.profile.profile_picture %}
+                            <img src="{{ conv.peer.profile.profile_picture.url }}" class="w-14 h-14 rounded-full border border-gray-800 object-cover">
+                        {% else %}
+                            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-white font-700 text-xl">
+                                {{ conv.peer.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-gray-900 rounded-full"></div>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-baseline mb-1">
+                            <h3 class="font-600 text-white group-hover:text-primary-container transition-colors truncate">{{ conv.peer.username }}</h3>
+                            <span class="text-[10px] font-700 text-gray-600 uppercase tracking-widest">{{ conv.last_message.timestamp|timesince }} ago</span>
+                        </div>
+                        <p class="text-sm text-gray-500 truncate leading-relaxed">
+                            {% if conv.last_message.sender == user %}
+                                <span class="text-gray-700 font-700">You:</span>
+                            {% endif %}
+                            {{ conv.last_message.content }}
+                        </p>
+                    </div>
+                    
+                    <span class="material-symbols-outlined text-gray-700 group-hover:text-white transition-all transform group-hover:translate-x-1">chevron_right</span>
+                </a>
+            {% empty %}
+                <div class="p-20 text-center">
+                    <span class="material-symbols-outlined text-6xl text-gray-800 mb-4 block">leak_remove</span>
+                    <h3 class="text-xl font-sora font-700 text-white mb-2">No active signal threads</h3>
+                    <p class="text-gray-600 max-w-xs mx-auto mb-8">Initialize a connection via the global talent search.</p>
+                    <a href="{% url 'search' %}" class="inline-flex items-center gap-2 px-8 py-3 bg-primary-container text-white rounded-xl font-700 hover:bg-primary-container/90 transition-all">
+                        <span class="material-symbols-outlined text-sm">search</span>
+                        Initialize Search
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

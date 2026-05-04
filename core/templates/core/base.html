@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{% block title %}SkillMesh | Connect & Grow{% endblock %}</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><path d='M20 80 L35 50 L50 70 L65 50 L80 80 M20 20 L50 40 L80 20 M20 20 L20 80 M80 20 L80 80 M20 20 L35 50 M80 20 L65 50' stroke='%23FF2D55' stroke-width='4' fill='none'/></svg>">
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#8c0038",
+                        "surface-dim": "#0f0f1a",
+                        "tertiary": "#ffe04a",
+                        "on-secondary-fixed-variant": "#004d4d",
+                        "primary-container": "#b3004e",
+                        "on-surface": "#e8e0f0",
+                        "on-tertiary": "#1a1000",
+                        "secondary-container": "#2d3748",
+                        "on-primary-container": "#ffd9e2"
+                    },
+                    borderRadius: {
+                        "none": "0",
+                        "xs": "0.125rem",
+                        "sm": "0.25rem",
+                        "default": "0.375rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "sora": ["Sora", "sans-serif"],
+                        "inter": ["Inter", "sans-serif"],
+                        "space-grotesk": ["Space Grotesk", "sans-serif"]
+                    }
+                }
+            }
+        };
+    </script>
+    
+    <style>
+        .animate-fade {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            background: rgba(15, 15, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 0.5rem;
+            min-width: 160px;
+            z-index: 100;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .dropdown-menu.show {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #9ca3af;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        .dropdown-item.text-red-500:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        /* Loading States */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.8;
+            color: transparent !important;
+        }
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 1.25rem;
+            height: 1.25rem;
+            top: 50%;
+            left: 50%;
+            margin-top: -0.625rem;
+            margin-left: -0.625rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-surface-dim text-on-surface font-inter">
+    <!-- Desktop Navigation -->
+    <nav class="fixed top-0 w-full bg-surface-dim/80 backdrop-blur-xl border-b border-gray-800 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="{% url 'index' %}" class="flex items-center gap-3 group">
+                <div class="relative w-8 h-8">
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(255,45,85,0.5)]">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF2D55" />
+                                <stop offset="50%" style="stop-color:#FF7D3F" />
+                                <stop offset="100%" style="stop-color:#FFD700" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M20 80 L35 50 L50 70 L65 50 L80 80 M20 20 L50 40 L80 20 M20 20 L20 80 M80 20 L80 80 M20 20 L35 50 M80 20 L65 50" 
+                              stroke="url(#logoGradient)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="20" cy="20" r="4" fill="#FF2D55" />
+                        <circle cx="80" cy="20" r="4" fill="#FFD700" />
+                        <circle cx="20" cy="80" r="4" fill="#FF2D55" />
+                        <circle cx="80" cy="80" r="4" fill="#FFD700" />
+                        <circle cx="50" cy="40" r="4" fill="#FF7D3F" />
+                        <circle cx="35" cy="50" r="4" fill="#FF5D4A" />
+                        <circle cx="65" cy="50" r="4" fill="#FFAC1F" />
+                        <circle cx="50" cy="70" r="4" fill="#FF7D3F" />
+                    </svg>
+                </div>
+                <span class="text-xl font-sora font-800 tracking-tighter text-white leading-none">
+                    Skill<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF2D55] via-[#FF7D3F] to-[#FFD700]">Mesh</span>
+                </span>
+            </a>
+            
+            <!-- Global Search -->
+            <form action="{% url 'search' %}" method="get" class="hidden md:flex items-center bg-gray-900/50 border border-gray-800 rounded-xl px-3 py-1.5 focus-within:border-primary-container/50 transition-all group min-w-[200px] lg:min-w-[240px]">
+                <span class="material-symbols-outlined text-gray-500 group-focus-within:text-primary-container text-[18px] transition-colors">search</span>
+                <input type="text" name="q" placeholder="Search the mesh..." class="bg-transparent border-none focus:ring-0 text-xs font-700 text-white placeholder-gray-600 w-full" value="{{ query|default:'' }}">
+            </form>
+
+            <!-- Centralized Taskbar -->
+            <div class="hidden md:flex items-center bg-gray-900/50 border border-gray-800 rounded-2xl p-1 gap-1">
+                <a href="{% url 'index' %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-all {% if request.resolver_match.url_name == 'index' %}bg-gray-800 text-white{% endif %}" title="Home Feed">
+                    <span class="material-symbols-outlined text-[20px]">home</span>
+                    <span class="text-[10px] font-800 uppercase tracking-widest hidden lg:block">Home</span>
+                </a>
+                <a href="{% url 'opportunities' %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-all {% if request.resolver_match.url_name == 'opportunities' %}bg-gray-800 text-white{% endif %}" title="Opportunities">
+                    <span class="material-symbols-outlined text-[20px]">work</span>
+                    <span class="text-[10px] font-800 uppercase tracking-widest hidden lg:block">Opportunities</span>
+                </a>
+                <a href="{% url 'inbox' %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-all {% if request.resolver_match.url_name == 'inbox' %}bg-gray-800 text-white{% endif %}" title="DMs">
+                    <span class="material-symbols-outlined text-[20px]">mail</span>
+                    <span class="text-[10px] font-800 uppercase tracking-widest hidden lg:block">Messages</span>
+                </a>
+                <a href="{% url 'profile' %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-all {% if request.resolver_match.url_name == 'profile' %}bg-gray-800 text-white{% endif %}" title="Identity Profile">
+                    <span class="material-symbols-outlined text-[20px]">person</span>
+                    <span class="text-[10px] font-800 uppercase tracking-widest hidden lg:block">Profile</span>
+                </a>
+                {% if user.is_staff %}
+                <a href="{% url 'insights' %}" class="flex items-center gap-2 px-4 py-2 rounded-xl text-pink-500 hover:text-white hover:bg-pink-500/10 transition-all {% if request.resolver_match.url_name == 'insights' %}bg-pink-500/20 text-white{% endif %}" title="System Insights">
+                    <span class="material-symbols-outlined text-[20px]">analytics</span>
+                    <span class="text-[10px] font-800 uppercase tracking-widest hidden lg:block">Insights</span>
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="flex items-center gap-4">
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'login' %}" class="text-xs font-800 text-gray-500 hover:text-white uppercase tracking-widest transition-colors px-4">Login</a>
+                    <a href="{% url 'register' %}" class="inline-flex items-center justify-center h-10 px-5 bg-[#FF2D55] text-white rounded-xl text-[10px] font-800 uppercase tracking-widest hover:bg-[#FF2D55]/90 transition-all">Join Now</a>
+                {% else %}
+                    <a href="{% url 'profile' %}" class="flex items-center gap-3 pl-4 border-l border-gray-800 hover:opacity-80 transition-opacity">
+                        {% if user.profile.profile_picture %}
+                            <img src="{{ user.profile.profile_picture.url }}" class="w-10 h-10 rounded-full border border-primary-container object-cover">
+                        {% else %}
+                            <div class="w-10 h-10 rounded-full bg-primary-container/20 border border-primary-container/50 flex items-center justify-center text-primary-container text-sm font-800">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Main Content Area -->
+    <main class="pt-20 pb-24 max-w-7xl mx-auto px-4">
+        <!-- System Messages -->
+        {% if messages %}
+            <div class="mb-8 space-y-4">
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'error' %}bg-red-500/10 border-red-500/50 text-red-500{% elif message.tags == 'success' %}bg-green-500/10 border-green-500/50 text-green-500{% else %}bg-primary-container/10 border-primary-container/50 text-primary-container{% endif %} border rounded-2xl p-4 flex items-center justify-between animate-fade">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-sm">
+                                {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}
+                            </span>
+                            <p class="text-xs font-700 uppercase tracking-widest">{{ message }}</p>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-gray-500 hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-sm">close</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="border-t border-gray-800 bg-black/20 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
+            <div class="flex items-center gap-3 opacity-50">
+                <div class="w-6 h-6">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <path d="M20 80 L35 50 L50 70 L65 50 L80 80 M20 20 L50 40 L80 20 M20 20 L20 80 M80 20 L80 80 M20 20 L35 50 M80 20 L65 50" 
+                              stroke="#666" stroke-width="4" fill="none" />
+                    </svg>
+                </div>
+                <span class="text-sm font-sora font-800 tracking-tighter text-gray-500">SkillMesh</span>
+            </div>
+            <p class="text-[10px] font-800 text-gray-600 uppercase tracking-[0.5em]">Connect • Share • Grow</p>
+            <p class="text-[9px] text-gray-800 font-600">© 2026 SKILLMESH OPERATING SYSTEM. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <!-- Mobile Navigation -->
+    <nav class="fixed bottom-0 w-full bg-surface-dim/95 backdrop-blur-xl border-t border-gray-800 py-3 lg:hidden z-50">
+        <div class="max-w-7xl mx-auto px-10 flex justify-between items-center text-gray-500">
+            <a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}text-white{% endif %}">
+                <span class="material-symbols-outlined">home</span>
+            </a>
+            <a href="{% url 'search' %}" class="{% if request.resolver_match.url_name == 'search' %}text-white{% endif %}">
+                <span class="material-symbols-outlined">search</span>
+            </a>
+            <a href="{% url 'opportunities' %}" class="{% if request.resolver_match.url_name == 'opportunities' %}text-white{% endif %}">
+                <span class="material-symbols-outlined">work</span>
+            </a>
+            <a href="{% url 'inbox' %}" class="{% if request.resolver_match.url_name == 'inbox' %}text-white{% endif %}">
+                <span class="material-symbols-outlined">mail</span>
+            </a>
+            <a href="{% url 'profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}text-white{% endif %}">
+                <span class="material-symbols-outlined">person</span>
+            </a>
+        </div>
+    </nav>
+
+    <div id="top-loading-bar" class="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-primary-container to-tertiary z-[60] transition-all duration-500 w-0 opacity-0"></div>
+
+    <!-- Global Scripts -->
+    <script>
+        // Loading State Helpers
+        function showLoading() {
+            const bar = document.getElementById('top-loading-bar');
+            bar.style.width = '30%';
+            bar.style.opacity = '1';
+            setTimeout(() => { bar.style.width = '70%'; }, 200);
+        }
+
+        function hideLoading() {
+            const bar = document.getElementById('top-loading-bar');
+            bar.style.width = '100%';
+            setTimeout(() => { bar.style.opacity = '0'; }, 300);
+            setTimeout(() => { bar.style.width = '0'; }, 800);
+        }
+
+        document.addEventListener('submit', function(event) {
+            const form = event.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.classList.add('btn-loading');
+                showLoading();
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            // Dropdown Toggle Logic
+            const dropdownToggle = event.target.closest('[data-dropdown-toggle]');
+            if (dropdownToggle) {
+                const menuId = dropdownToggle.getAttribute('data-dropdown-toggle');
+                const menu = document.getElementById(menuId);
+                
+                // Close other open menus
+                document.querySelectorAll('.dropdown-menu.show').forEach(m => {
+                    if (m !== menu) m.classList.remove('show');
+                });
+                
+                menu.classList.toggle('show');
+                event.stopPropagation();
+                return;
+            }
+
+            // Global Click Feedback for Links
+            const anchor = event.target.closest('a');
+            if (anchor && !anchor.getAttribute('target') && !anchor.getAttribute('href').startsWith('#') && !anchor.getAttribute('data-no-load')) {
+                showLoading();
+                if (anchor.classList.contains('dropdown-item') || anchor.classList.contains('btn')) {
+                    // Optionally add feedback to specific links
+                }
+            }
+
+            // Close menus when clicking outside
+            if (!event.target.closest('.dropdown-menu')) {
+                document.querySelectorAll('.dropdown-menu.show').forEach(m => m.classList.remove('show'));
+            }
+        });
+
+        // Hide loading bar when page is loaded (from bfcache or normal)
+        window.addEventListener('pageshow', hideLoading);
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,147 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto animate-fade">
+    <div class="flex items-center gap-4 mb-10">
+        <a href="{% url 'index' %}" class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-500 hover:text-white hover:border-gray-700 transition-all">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-4xl font-sora font-800 text-white tracking-tighter uppercase">{{ title|default:"Broadcast Signal" }}</h1>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <!-- Main Form -->
+        <div class="lg:col-span-8 space-y-8">
+            <form method="post" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Content Editor -->
+                <div class="bg-gray-900/50 border border-gray-800 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-container to-tertiary opacity-20 group-focus-within:opacity-100 transition-opacity"></div>
+                    <textarea 
+                        name="content" 
+                        required
+                        class="w-full bg-transparent border-none focus:ring-0 text-xl font-body text-white placeholder:text-gray-600 min-h-[250px] resize-none"
+                        placeholder="Share your latest project, skill achievement, or collaboration request...">{{ form.content.value|default:"" }}</textarea>
+                    
+                    <!-- Media Bar Mockup -->
+                    <div class="flex items-center gap-6 mt-6 pt-6 border-t border-gray-800/50">
+                        <button type="button" class="flex items-center gap-2 text-primary-container hover:bg-primary-container/10 px-4 py-2 rounded-full transition-colors text-xs font-800 uppercase tracking-widest">
+                            <span class="material-symbols-outlined text-sm">image</span>
+                            Media
+                        </button>
+                        <button type="button" class="flex items-center gap-2 text-tertiary hover:bg-tertiary/10 px-4 py-2 rounded-full transition-colors text-xs font-800 uppercase tracking-widest">
+                            <span class="material-symbols-outlined text-sm">link</span>
+                            Link
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Post Type & Skills -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <label class="text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Signal Type</label>
+                        <div class="relative group select-wrapper">
+                            {{ form.post_type }}
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-focus-within:text-primary-container transition-colors">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Verification Layer</label>
+                        <div class="px-4 py-3 bg-gray-900/30 border border-gray-800 rounded-xl flex items-center gap-3">
+                            <span class="material-symbols-outlined text-green-500 text-sm">verified_user</span>
+                            <span class="text-xs font-700 text-gray-400">System verified broadcast</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skill Tagging -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between px-1">
+                        <label class="text-xs font-800 text-gray-500 uppercase tracking-[0.2em]">Associated Protocols</label>
+                        <span class="text-[10px] font-700 text-primary-container uppercase tracking-widest">Recommended</span>
+                    </div>
+                    
+                    <div class="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {% for skill_id, skill_name in form.fields.related_skills.choices %}
+                                <label class="flex items-center gap-3 p-3 bg-black/20 border border-gray-800 rounded-xl cursor-pointer hover:border-gray-600 transition-all group">
+                                    <input type="checkbox" name="related_skills" value="{{ skill_id }}" class="w-4 h-4 bg-gray-900 border-gray-700 rounded text-primary-container focus:ring-primary-container"
+                                        {% if skill_id|stringformat:"s" in form.related_skills.value|stringformat:"s" %}checked{% endif %}>
+                                    <span class="text-xs font-700 text-gray-500 group-hover:text-white transition-colors">{{ skill_name }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Cluster -->
+                <div class="flex items-center justify-end gap-6 pt-10 border-t border-gray-800">
+                    <a href="{% url 'index' %}" class="text-xs font-800 text-gray-500 uppercase tracking-widest hover:text-white transition-colors">Discard</a>
+                    <button type="submit" class="bg-primary-container text-white px-12 py-4 rounded-xl font-800 text-sm uppercase tracking-widest shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        {{ edit_mode|yesno:"Update Signal,Broadcast Signal" }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar Tips -->
+        <aside class="lg:col-span-4 space-y-8">
+            <div class="bg-gray-900/50 border border-gray-800 rounded-3xl p-8">
+                <h3 class="text-lg font-sora font-800 text-white mb-6 uppercase tracking-tight">Signal Ops</h3>
+                <ul class="space-y-6">
+                    <li class="flex gap-4">
+                        <span class="text-primary-container font-800 text-sm">01</span>
+                        <p class="text-sm text-gray-500 leading-relaxed">Be specific about your <span class="text-white font-600">technical objective</span>.</p>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="text-primary-container font-800 text-sm">02</span>
+                        <p class="text-sm text-gray-500 leading-relaxed">Tagging <span class="text-white font-600">protocols</span> increases reach by 400%.</p>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="text-primary-container font-800 text-sm">03</span>
+                        <p class="text-sm text-gray-500 leading-relaxed">Signal strength is determined by <span class="text-white font-600">community resonance</span>.</p>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-3xl p-8 relative overflow-hidden group">
+                <div class="relative z-10">
+                    <p class="text-sm text-gray-400 font-600 leading-relaxed mb-4">"The most effective signals are those that bridge multiple domains."</p>
+                    <p class="text-[10px] text-gray-600 font-800 uppercase tracking-widest">— Mesh Analytics</p>
+                </div>
+                <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-white/5 transform group-hover:scale-110 transition-transform">hub</span>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<style>
+    /* Styling for the Django select field */
+    select[name="post_type"] {
+        width: 100%;
+        background-color: rgba(15, 15, 26, 0.8);
+        border: 1px solid #1f2937;
+        border-radius: 1rem;
+        padding: 1rem 3rem 1rem 1.25rem;
+        color: white;
+        appearance: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    select[name="post_type"]:focus {
+        border-color: #FF2D78;
+        background-color: rgba(15, 15, 26, 1);
+        box-shadow: 0 0 0 4px rgba(255, 45, 120, 0.1);
+        outline: none;
+    }
+    select[name="post_type"] option {
+        background-color: #0f0f1a;
+        color: white;
+        padding: 1rem;
+    }
+</style>
+{% endblock content %}
+

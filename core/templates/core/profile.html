@@ -1,0 +1,206 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade">
+    <!-- Sidebar: Profile Info & Activity -->
+    <aside class="lg:col-span-4 space-y-6">
+        <!-- Profile Card -->
+        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 text-center relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-container to-tertiary opacity-50"></div>
+            
+            <div class="relative inline-block mb-6">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" class="w-32 h-32 rounded-full mx-auto border-4 border-gray-800 shadow-2xl object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                    <div class="w-32 h-32 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-white text-5xl font-800 mx-auto border-4 border-gray-800 shadow-2xl">
+                        {{ profile.user.username|first|upper }}
+                    </div>
+                {% endif %}
+                {% if profile.open_to_work %}
+                    <div class="absolute bottom-1 right-1 px-3 py-1 bg-green-500 text-black text-[10px] font-800 rounded-full border-2 border-gray-900 uppercase tracking-tighter">
+                        Open to Work
+                    </div>
+                {% endif %}
+            </div>
+
+            <h2 class="text-2xl font-sora font-800 text-white mb-1 tracking-tighter">{{ profile.user.username }}</h2>
+            <p class="text-sm text-gray-500 mb-6">@{{ profile.user.username|lower }}</p>
+
+            <div class="flex flex-col gap-3">
+                {% if user == profile.user %}
+                    <a href="{% url 'edit_profile' %}" class="flex items-center justify-center gap-2 w-full py-3 bg-primary-container text-white rounded-xl font-600 hover:bg-primary-container/90 transition-colors">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                        Edit Profile
+                    </a>
+                    <a href="{% url 'logout' %}" class="flex items-center justify-center gap-2 w-full py-3 border border-red-500/30 text-red-500 rounded-xl font-600 hover:bg-red-500/10 transition-all">
+                        <span class="material-symbols-outlined text-sm">logout</span>
+                        Sign Out
+                    </a>
+                {% else %}
+                    <a href="{% url 'send_message' profile.user.username %}" class="flex items-center justify-center gap-2 w-full py-3 bg-primary-container text-white rounded-xl font-600 hover:bg-primary-container/90 transition-colors">
+                        <span class="material-symbols-outlined text-sm">chat_bubble</span>
+                        Message
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-gray-800/50">
+                <div>
+                    <p class="text-xl font-sora font-800 text-white">0</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-600">Connections</p>
+                </div>
+                <div>
+                    <p class="text-xl font-sora font-800 text-white">{{ profile.user.posts.count }}</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-600">Signals</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed (Stitch Component) -->
+        <div class="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
+            <h3 class="text-xs font-800 text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary-container text-sm">trending_up</span>
+                System Activity
+            </h3>
+            <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-green-500 text-sm mt-0.5">check_circle</span>
+                    <p class="text-sm text-gray-400 leading-snug">Verified top 5% in <span class="text-white font-600">React</span> community</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-primary-container text-sm mt-0.5">article</span>
+                    <p class="text-sm text-gray-400 leading-snug">Published 4 technical specifications</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-tertiary text-sm mt-0.5">bolt</span>
+                    <p class="text-sm text-gray-400 leading-snug">High signal-to-noise ratio: 0.98</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content: About & Stack -->
+    <main class="lg:col-span-8 space-y-8">
+        <!-- About Section -->
+        <section class="bg-gray-900/20 border border-gray-800 rounded-3xl p-8 lg:p-10 relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-container/5 blur-[80px] rounded-full"></div>
+            <h3 class="text-xl font-sora font-800 text-white mb-6 flex items-center gap-3">
+                <span class="w-2 h-2 bg-primary-container rounded-full"></span>
+                Objective
+            </h3>
+            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl">
+                {{ profile.bio|default:"This builder is currently operating in stealth mode. Intelligence gathering in progress." }}
+            </p>
+        </section>
+
+        <!-- Technical Stack -->
+        <section class="bg-gray-900/40 backdrop-blur-sm border border-gray-800 rounded-3xl p-8 lg:p-10">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-xl font-sora font-800 text-white flex items-center gap-3">
+                    <span class="w-2 h-2 bg-tertiary rounded-full"></span>
+                    Technical Stack
+                </h3>
+                {% if user == profile.user %}
+                    <button id="add-skill-trigger" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-700 rounded-full transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                        Index Skill
+                    </button>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-wrap gap-4 mb-8">
+                {% for skill in profile.skills.all %}
+                    <div class="px-5 py-3 bg-gray-800/50 border border-gray-700 rounded-2xl flex items-center gap-3 hover:border-primary-container transition-colors group cursor-default">
+                        <span class="material-symbols-outlined text-gray-600 group-hover:text-primary-container transition-colors">memory</span>
+                        <span class="font-600 text-gray-300 group-hover:text-white transition-colors">{{ skill.name }}</span>
+                    </div>
+                {% empty %}
+                    <div class="w-full py-12 border border-gray-800 border-dashed rounded-2xl text-center">
+                        <p class="text-gray-600 text-sm italic">No technical protocols registered.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if user == profile.user %}
+                <form id="skill-form" action="{% url 'add_skill' %}" method="post" class="hidden mt-6 animate-fade">
+                    {% csrf_token %}
+                    <div class="flex gap-4">
+                        <input type="text" name="skill_name" class="flex-1 bg-black/50 border border-gray-800 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-primary-container" placeholder="Protocol name (e.g. Rust, Web3)..." required>
+                        <button type="submit" class="px-6 py-3 bg-primary-container text-white rounded-xl font-700 hover:bg-primary-container/90 transition-colors">Add</button>
+                    </div>
+                </form>
+            {% endif %}
+        </section>
+
+        <!-- Signal History (Recent Posts) -->
+        <section class="space-y-6">
+            <h3 class="text-xl font-sora font-800 text-white px-2">Signal History</h3>
+            {% for post in profile.user.posts.all|dictsortreversed:"created_at" %}
+                <article class="bg-gray-900/40 border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-colors group">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <p class="text-xs text-gray-500 font-600 uppercase tracking-widest">{{ post.created_at|timesince }} ago</p>
+                            <div class="px-3 py-1 bg-gray-800 rounded-full text-[10px] font-800 text-gray-400 uppercase tracking-tighter">
+                                {% if post.post_type == 'hiring' %}
+                                    <span class="text-primary-container">Hiring</span>
+                                {% elif post.post_type == 'open_to_work' %}
+                                    <span class="text-green-500">Open to Work</span>
+                                {% else %}
+                                    General
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="relative">
+                            <button data-dropdown-toggle="post-menu-{{ post.id }}" class="text-gray-600 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-800">
+                                <span class="material-symbols-outlined">more_horiz</span>
+                            </button>
+                            
+                            <div id="post-menu-{{ post.id }}" class="dropdown-menu">
+                                {% if post.user == request.user %}
+                                    <a href="{% url 'edit_post' post.id %}" class="dropdown-item">
+                                        <span class="material-symbols-outlined text-sm">edit</span>
+                                        Edit Signal
+                                    </a>
+                                    <a href="{% url 'delete_post' post.id %}" class="dropdown-item text-red-500" onclick="return confirm('Terminate this signal sequence?')">
+                                        <span class="material-symbols-outlined text-sm text-red-500">delete</span>
+                                        Terminate
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="dropdown-item">
+                                        <span class="material-symbols-outlined text-sm">report</span>
+                                        Report Signal
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-gray-400 leading-relaxed prose prose-invert max-w-none mb-6">
+                        {{ post.content|linebreaks }}
+                    </div>
+                    <div class="flex gap-2">
+                        {% for skill in post.related_skills.all %}
+                            <span class="text-[10px] font-700 text-gray-600 uppercase tracking-wider">#{{ skill.name }}</span>
+                        {% endfor %}
+                    </div>
+                </article>
+            {% empty %}
+                <div class="py-12 text-center text-gray-600">
+                    <p class="text-sm italic">No signals broadcasted yet.</p>
+                </div>
+            {% endfor %}
+        </section>
+    </main>
+</div>
+
+<script>
+    const trigger = document.getElementById('add-skill-trigger');
+    const form = document.getElementById('skill-form');
+    if (trigger && form) {
+        trigger.addEventListener('click', () => {
+            form.classList.toggle('hidden');
+        });
+    }
+</script>
+{% endblock content %}
+

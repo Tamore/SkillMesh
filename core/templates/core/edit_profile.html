@@ -1,0 +1,184 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto animate-fade">
+    <div class="flex items-center gap-4 mb-10">
+        <a href="{% url 'profile' %}" class="w-12 h-12 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-500 hover:text-white hover:border-gray-700 transition-all">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-4xl font-sora font-800 text-white tracking-tighter uppercase">Configure Identity</h1>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_profile">
+        
+        <!-- Main Configuration Card -->
+        <div class="bg-gray-900/40 backdrop-blur-xl border border-gray-800 rounded-3xl p-8 lg:p-12 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-primary-container/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+            
+            <div class="relative space-y-10">
+                <!-- Username Section -->
+                <div class="space-y-4">
+                    <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Identity Handle (Username)</label>
+                    <div class="relative group">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary-container transition-colors">alternate_email</span>
+                        <input 
+                            type="text" 
+                            name="username" 
+                            value="{{ user_form.username.value }}"
+                            class="w-full bg-black/50 border border-gray-800 rounded-2xl pl-12 pr-6 py-4 text-white placeholder-gray-700 focus:outline-none focus:border-primary-container transition-all"
+                            placeholder="username">
+                    </div>
+                </div>
+
+                <!-- Bio Section -->
+                <div class="space-y-4">
+                    <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Identity Log (Bio)</label>
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-primary-container/20 to-tertiary/20 rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+                        <textarea 
+                            name="bio" 
+                            rows="4"
+                            class="relative w-full bg-black/50 border border-gray-800 rounded-2xl px-6 py-4 text-white placeholder-gray-700 focus:outline-none focus:border-primary-container transition-all resize-none"
+                            placeholder="Describe your technical objective...">{{ form.bio.value|default:"" }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Profile Picture Section -->
+                <div class="space-y-4">
+                    <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Visual Identifier</label>
+                    <div class="flex items-center gap-6 p-6 bg-gray-900/50 border border-gray-800 rounded-2xl">
+                        <div class="relative group">
+                            <div id="preview-container" class="w-20 h-20 rounded-2xl overflow-hidden border-2 border-gray-800 group-hover:border-primary-container transition-colors relative">
+                                {% if profile.profile_picture %}
+                                    <img id="image-preview" src="{{ profile.profile_picture.url }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <div id="placeholder-preview" class="w-full h-full bg-gray-800 flex items-center justify-center text-gray-600">
+                                        <span class="material-symbols-outlined text-4xl">person</span>
+                                    </div>
+                                    <img id="image-preview" src="#" class="w-full h-full object-cover hidden">
+                                {% endif %}
+                                <div id="upload-overlay" class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity pointer-events-none">
+                                    <span class="material-symbols-outlined text-white text-xl">sync</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 space-y-3">
+                            <input type="file" name="profile_picture" id="profile_picture" class="hidden" onchange="previewImage(this)">
+                            <div class="flex items-center gap-3">
+                                <label for="profile_picture" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-700 rounded-lg cursor-pointer transition-colors shadow-lg">
+                                    <span class="material-symbols-outlined text-sm">upload</span>
+                                    Upload New Protocol Image
+                                </label>
+                                <span id="file-status" class="text-[10px] text-primary-container font-800 uppercase tracking-widest hidden flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">check_circle</span>
+                                    Selected
+                                </span>
+                            </div>
+                            <p class="text-[10px] text-gray-600 uppercase font-600 tracking-wider">Recommended: Square PNG/JPG, max 2MB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function previewImage(input) {
+                        const preview = document.getElementById('image-preview');
+                        const placeholder = document.getElementById('placeholder-preview');
+                        const status = document.getElementById('file-status');
+                        const overlay = document.getElementById('upload-overlay');
+                        
+                        if (input.files && input.files[0]) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                preview.src = e.target.result;
+                                preview.classList.remove('hidden');
+                                if (placeholder) placeholder.classList.add('hidden');
+                                status.classList.remove('hidden');
+                                overlay.classList.add('opacity-100');
+                            }
+                            reader.readAsDataURL(input.files[0]);
+                        }
+                    }
+                </script>
+
+
+                <!-- Status Section -->
+                <div class="space-y-4">
+                    <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Availability Status</label>
+                    <label class="flex items-center gap-4 p-4 bg-gray-900/30 border border-gray-800 rounded-2xl cursor-pointer hover:border-gray-700 transition-all">
+                        <div class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="open_to_work" class="sr-only peer" {% if form.open_to_work.value %}checked{% endif %}>
+                            <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-700 text-white">Open to Work</p>
+                            <p class="text-[10px] text-gray-600 uppercase font-600 tracking-wider">Signal visibility for recruiters</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-6 pt-4">
+            <a href="{% url 'profile' %}" class="text-xs font-800 text-gray-500 uppercase tracking-widest hover:text-white transition-colors">Abort Changes</a>
+            <button type="submit" class="bg-primary-container text-white px-10 py-4 rounded-xl font-800 text-sm uppercase tracking-widest shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all">
+                Synchronize Identity
+            </button>
+        </div>
+    </form>
+
+    <!-- Security Protocols (Password Rotation) -->
+    <div class="mt-16 space-y-8">
+        <h2 class="text-2xl font-sora font-800 text-white tracking-tighter uppercase px-1">Security Protocols</h2>
+        
+        <form method="post" class="bg-gray-900/20 border border-gray-800 rounded-3xl p-8 lg:p-12 space-y-8">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="change_password">
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                {% for field in password_form %}
+                <div class="space-y-3">
+                    <label class="block text-xs font-800 text-gray-500 uppercase tracking-widest px-1">{{ field.label }}</label>
+                    <div class="relative group">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-tertiary transition-colors">lock</span>
+                        <input 
+                            type="password" 
+                            name="{{ field.name }}"
+                            class="w-full bg-black/40 border border-gray-800 rounded-2xl pl-12 pr-6 py-4 text-white placeholder-gray-700 focus:outline-none focus:border-tertiary transition-all"
+                            placeholder="••••••••">
+                    </div>
+                    {% if field.errors %}
+                        <p class="text-[10px] text-red-500 font-700 uppercase tracking-wider px-1">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="flex items-center justify-between pt-6 border-t border-gray-800/50">
+                <p class="text-[10px] text-gray-600 uppercase font-600 tracking-[0.2em] max-w-xs">
+                    Password rotation will terminate all active session identifiers except the current one.
+                </p>
+                <button type="submit" class="bg-gray-800 hover:bg-tertiary hover:text-black text-white px-8 py-4 rounded-xl font-800 text-xs uppercase tracking-widest transition-all">
+                    Rotate Secret Key
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="mt-16 border-t border-red-500/10 pt-16 mb-20">
+        <div class="bg-red-500/5 border border-red-500/20 rounded-3xl p-8 flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-sora font-800 text-red-500 uppercase tracking-tighter">Terminate Session</h3>
+                <p class="text-sm text-gray-500 mt-1">Disconnect your current protocol identifier and exit the mesh.</p>
+            </div>
+            <a href="{% url 'logout' %}" class="px-8 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/30 rounded-xl font-800 text-xs uppercase tracking-widest transition-all">
+                Sign Out
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

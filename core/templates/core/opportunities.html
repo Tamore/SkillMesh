@@ -1,0 +1,123 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto animate-fade">
+    <!-- Header & Search -->
+    <section class="mb-12">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
+            <div class="space-y-2">
+                <h1 class="text-3xl lg:text-5xl font-sora font-800 text-white leading-tight tracking-tighter uppercase">
+                    High-Stakes <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-container to-tertiary">Opportunities</span>
+                </h1>
+                <p class="text-gray-500 font-600 uppercase tracking-widest text-xs">Direct signals from hiring nodes across the mesh.</p>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 rounded-full px-4 py-1.5 text-xs font-700 text-gray-500 whitespace-nowrap">
+                {{ posts.count }} Active Openings
+            </div>
+        </div>
+
+        <form action="{% url 'opportunities' %}" method="get" class="relative group">
+            <div class="absolute -inset-1 bg-gradient-to-r from-primary-container to-tertiary rounded-2xl blur opacity-10 group-focus-within:opacity-30 transition duration-500"></div>
+            <div class="relative flex items-center bg-gray-900/50 backdrop-blur-xl border border-gray-800 rounded-2xl p-2">
+                <span class="material-symbols-outlined ml-4 text-primary-container opacity-70">search</span>
+                <input type="text" name="q" value="{{ query }}" class="w-full bg-transparent border-none focus:ring-0 px-4 py-3 text-lg text-white placeholder:text-gray-600" placeholder="Search by role, stack, or company...">
+                <button type="submit" class="bg-primary-container text-white px-8 py-3 rounded-xl font-800 hover:shadow-[0_0_20px_rgba(179,0,78,0.4)] transition-all">Filter</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Opportunity Feed -->
+    <section class="grid gap-6">
+        {% for post in posts %}
+            <article class="bg-gray-900/40 backdrop-blur-sm border border-gray-800 rounded-3xl p-6 lg:p-8 hover:border-primary-container/50 transition-all group animate-fade">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- Author Info -->
+                    <div class="shrink-0">
+                        <a href="{% url 'profile' %}?username={{ post.user.username }}" class="block relative">
+                            {% if post.user.profile.profile_picture %}
+                                <img src="{{ post.user.profile.profile_picture.url }}" class="w-16 h-16 rounded-2xl border border-gray-800 object-cover group-hover:border-primary-container transition-colors">
+                            {% else %}
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white font-800 text-2xl border border-gray-800 group-hover:border-primary-container transition-colors">
+                                    {{ post.user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </a>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3">
+                                <a href="{% url 'profile' %}?username={{ post.user.username }}" class="font-sora font-700 text-lg text-white hover:text-primary-container transition-colors">{{ post.user.username }}</a>
+                                <span class="px-2 py-0.5 bg-primary-container/10 border border-primary-container/30 text-primary-container text-[10px] font-800 uppercase tracking-widest rounded">Hiring</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-[10px] font-700 text-gray-600 uppercase tracking-widest">{{ post.created_at|timesince }} ago</span>
+                                <div class="relative">
+                                    <button data-dropdown-toggle="post-menu-{{ post.id }}" class="text-gray-600 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-800">
+                                        <span class="material-symbols-outlined">more_horiz</span>
+                                    </button>
+                                    
+                                    <div id="post-menu-{{ post.id }}" class="dropdown-menu">
+                                        {% if post.user == request.user %}
+                                            <a href="{% url 'edit_post' post.id %}" class="dropdown-item">
+                                                <span class="material-symbols-outlined text-sm">edit</span>
+                                                Edit Signal
+                                            </a>
+                                            <a href="{% url 'delete_post' post.id %}" class="dropdown-item text-red-500" onclick="return confirm('Terminate this signal sequence?')">
+                                                <span class="material-symbols-outlined text-sm text-red-500">delete</span>
+                                                Terminate
+                                            </a>
+                                        {% else %}
+                                            <a href="#" class="dropdown-item">
+                                                <span class="material-symbols-outlined text-sm">report</span>
+                                                Report Signal
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-gray-400 leading-relaxed mb-6 prose prose-invert max-w-none">
+                            {{ post.content|linebreaks }}
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 mb-8">
+                            {% for skill in post.related_skills.all %}
+                                <span class="px-3 py-1 bg-gray-800 border border-gray-700 rounded-lg text-[10px] font-800 text-gray-500 uppercase tracking-wider">#{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="flex items-center justify-between pt-6 border-t border-gray-800/50">
+                            <div class="flex gap-4">
+                                <button class="flex items-center gap-2 text-gray-600 hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined text-xl">favorite</span>
+                                    <span class="text-xs font-700">0</span>
+                                </button>
+                                <button class="flex items-center gap-2 text-gray-600 hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined text-xl">comment</span>
+                                    <span class="text-xs font-700">0</span>
+                                </button>
+                            </div>
+                            <div class="flex gap-3">
+                                <a href="{% url 'send_message' post.user.username %}" class="inline-flex items-center justify-center h-10 px-6 bg-[#FF2D55] text-white rounded-xl text-[10px] font-800 uppercase tracking-widest hover:bg-[#FF2D55]/90 hover:shadow-[0_0_20px_rgba(255,45,85,0.3)] transition-all">Inquire</a>
+                                <button class="p-2.5 text-gray-500 hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined">bookmark</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        {% empty %}
+            <div class="bg-gray-900/30 border border-gray-800 border-dashed rounded-3xl p-20 text-center">
+                <span class="material-symbols-outlined text-6xl text-gray-800 mb-4 block">work_off</span>
+                <h3 class="text-xl font-sora font-700 text-white mb-2">No hiring signals detected</h3>
+                <p class="text-gray-600 max-w-xs mx-auto mb-8">The mesh is currently quiet. Try broadening your protocol search.</p>
+                <a href="{% url 'opportunities' %}" class="inline-flex items-center gap-2 px-8 py-3 bg-gray-800 text-white rounded-xl font-700 hover:bg-gray-700 transition-all">Reset Filter</a>
+            </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock content %}
