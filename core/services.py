@@ -7,6 +7,8 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from .models import Event, UserProfile, Skill, Post, Message
 
+from django.db import transaction, IntegrityError
+
 def log_event(event_type, start_time, status="success"):
     """
     Calculates processing time and stores the event in the database.
@@ -21,6 +23,7 @@ def log_event(event_type, start_time, status="success"):
     )
     return event
 
+@transaction.atomic
 def register_user(username, email, password, bio=""):
     """
     Registers a new user, creates a profile, and logs the UserRegistered event.

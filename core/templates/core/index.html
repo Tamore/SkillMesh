@@ -159,18 +159,37 @@
 
                 <div class="flex items-center justify-between pt-4 border-t border-gray-800/50">
                     <div class="flex gap-6">
-                        <button class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors group">
-                            <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">favorite</span>
-                            <span class="text-xs font-600">0</span>
-                        </button>
-                        <button class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors group">
+                        <a href="{% url 'toggle_like' post.id %}" class="flex items-center gap-2 {% if user in post.likes.all %}text-primary-container{% else %}text-gray-500{% endif %} hover:text-white transition-colors group">
+                            <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform {% if user in post.likes.all %}fill-1{% endif %}">favorite</span>
+                            <span class="text-xs font-600">{{ post.likes.count }}</span>
+                        </a>
+                        <button onclick="toggleCommentForm({{ post.id }})" class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors group">
                             <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">comment</span>
-                            <span class="text-xs font-600">0</span>
+                            <span class="text-xs font-600">{{ post.comments.count }}</span>
                         </button>
                     </div>
-                    <button class="text-gray-500 hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-xl">bookmark</span>
-                    </button>
+                    <a href="{% url 'toggle_save' post.id %}" class="{% if post.id in saved_post_ids %}text-primary-container{% else %}text-gray-500{% endif %} hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-xl {% if post.id in saved_post_ids %}fill-1{% endif %}">bookmark</span>
+                    </a>
+                </div>
+
+                <!-- Quick Comment Form (Hidden by default) -->
+                <div id="comment-form-{{ post.id }}" class="hidden mt-4 pt-4 border-t border-gray-800/30">
+                    <form action="{% url 'add_comment' post.id %}" method="POST" class="flex gap-3">
+                        {% csrf_token %}
+                        <input type="text" name="content" placeholder="Write a response..." class="flex-1 bg-black/50 border border-gray-800 rounded-xl px-4 py-2 text-sm text-white focus:border-primary-container outline-none transition-all">
+                        <button type="submit" class="bg-primary-container text-white px-4 py-2 rounded-xl text-xs font-800 uppercase tracking-widest hover:bg-primary-container/90 transition-all">Send</button>
+                    </form>
+                    {% if post.comments.all %}
+                        <div class="mt-4 space-y-3">
+                            {% for comment in post.comments.all|slice:":3" %}
+                                <div class="text-xs bg-white/5 p-3 rounded-xl border border-white/5">
+                                    <span class="font-800 text-white mr-2">{{ comment.user.username }}</span>
+                                    <span class="text-gray-400">{{ comment.content }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
             </article>
         {% empty %}
@@ -189,4 +208,27 @@
     </main>
 </div>
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+function toggleCommentForm(postId) {
+    const form = document.getElementById(`comment-form-${postId}`);
+    if (form.classList.contains('hidden')) {
+        form.classList.remove('hidden');
+        form.classList.add('animate-fade-in');
+    } else {
+        form.classList.add('hidden');
+    }
+}
+</script>
+
+<style>
+.fill-1 { font-variation-settings: 'FILL' 1; }
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+</style>
+{% endblock %}
 

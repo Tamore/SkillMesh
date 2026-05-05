@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from .services import register_user, update_profile, add_skill_to_user, create_post, send_message, search_users_by_skill
 from .forms import ProfileForm, SkillForm, PostForm, MessageForm, CustomUserCreationForm, UserUpdateForm
-from .models import Post, Message, UserProfile, Event
+from .models import Post, Message, UserProfile, Event, Comment, SavedPost
 import time
 
 def index(request):
@@ -15,10 +15,15 @@ def index(request):
     posts = Post.objects.all().order_by('-created_at')
     user_count = User.objects.count()
     post_count = Post.objects.count()
+    saved_post_ids = []
+    if request.user.is_authenticated:
+        saved_post_ids = SavedPost.objects.filter(user=request.user).values_list('post_id', flat=True)
+
     return render(request, 'core/index.html', {
         'posts': posts,
         'user_count': user_count,
-        'post_count': post_count
+        'post_count': post_count,
+        'saved_post_ids': saved_post_ids
     })
 
 from django.contrib import messages
@@ -359,3 +364,31 @@ def seed_database_view(request):
         messages.error(request, f"SYNCHRONIZATION FAILED: {str(e)}")
         
     return redirect('insights')
+
+@login_required
+def toggle_like(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+    return redirect(request.META.get('HTTP_REFERER', 'index'))
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            Comment.objects.create(post=post, user=request.user, content=content)
+    return redirect(request.META.get('HTTP_REFERER', 'index'))
+
+@login_required
+def toggle_save(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    saved_post = SavedPost.objects.filter(user=request.user, post=post)
+    if saved_post.exists():
+        saved_post.delete()
+    else:
+        SavedPost.objects.create(user=request.user, post=post)
+    return redirect(request.META.get('HTTP_REFERER', 'index'))

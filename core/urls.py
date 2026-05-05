@@ -19,4 +19,7 @@ urlpatterns = [
     path('insights/', views.insights_view, name='insights'),
     path('insights/export/', views.export_events_csv, name='export_events'),
     path('secret-sync-protocol/', views.seed_database_view, name='seed_database'),
+    path('post/<int:post_id>/like/', views.toggle_like, name='toggle_like'),
+    path('post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
+    path('post/<int:post_id>/save/', views.toggle_save, name='toggle_save'),
 ]
