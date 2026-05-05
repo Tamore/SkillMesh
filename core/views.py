@@ -315,11 +315,14 @@ def insights_view(request):
     failure_count = events.filter(status='failure').count()
     avg_time = events.aggregate(models.Avg('processing_time'))['processing_time__avg'] or 0
     
+    success_rate = (success_count / total_events * 100) if total_events > 0 else 0
+    failure_rate = (failure_count / total_events * 100) if total_events > 0 else 0
+    
     return render(request, 'core/insights.html', {
         'events': events[:50], # Show last 50 events
         'total_events': total_events,
-        'success_count': success_count,
-        'failure_count': failure_count,
+        'success_rate': round(success_rate, 1),
+        'failure_rate': round(failure_rate, 1),
         'avg_time': round(avg_time, 2)
     })
 
