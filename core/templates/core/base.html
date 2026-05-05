@@ -219,15 +219,15 @@
         {% if messages %}
             <div class="mb-8 space-y-4">
                 {% for message in messages %}
-                    <div class="{% if message.tags == 'error' %}bg-red-500/10 border-red-500/50 text-red-500{% elif message.tags == 'success' %}bg-green-500/10 border-green-500/50 text-green-500{% else %}bg-primary-container/10 border-primary-container/50 text-primary-container{% endif %} border rounded-2xl p-4 flex items-center justify-between animate-fade">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-sm">
-                                {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}
+                    <div class="{% if message.tags == 'error' %}bg-red-950/30 border-red-500/30 text-red-400/80{% elif message.tags == 'success' %}bg-green-950/30 border-green-500/30 text-green-400/80{% else %}bg-gray-950/40 border-gray-500/30 text-gray-400{% endif %} border rounded-full px-6 py-4 flex items-center justify-between animate-fade backdrop-blur-md shadow-2xl">
+                        <div class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-[18px] opacity-60">
+                                {% if message.tags == 'error' %}info{% elif message.tags == 'success' %}verified{% else %}info{% endif %}
                             </span>
-                            <p class="text-xs font-700 uppercase tracking-widest">{{ message }}</p>
+                            <p class="text-[10px] font-800 uppercase tracking-[0.25em] leading-none">{{ message }}</p>
                         </div>
-                        <button onclick="this.parentElement.remove()" class="text-gray-500 hover:text-white transition-colors">
-                            <span class="material-symbols-outlined text-sm">close</span>
+                        <button onclick="this.parentElement.remove()" class="opacity-40 hover:opacity-100 transition-opacity">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
                         </button>
                     </div>
                 {% endfor %}

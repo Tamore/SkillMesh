@@ -35,12 +35,20 @@ def register_view(request):
             if User.objects.filter(username=username).exists():
                 username = f"{username}{User.objects.count()}"
                 
-            user = register_user(
-                username=username,
-                email=form.cleaned_data.get('email'),
-                password=form.cleaned_data.get('password'),
-                bio=f"Hi, I'm {full_name}."
-            )
+            try:
+                user = register_user(
+                    username=username,
+                    email=form.cleaned_data.get('email'),
+                    password=form.cleaned_data.get('password'),
+                    bio=f"Hi, I'm {full_name}."
+                )
+            except Exception as e:
+                messages.error(request, "REGISTRATION FAILED. PROTOCOL SYNCHRONIZATION ERROR.")
+                return render(request, 'core/register.html', {
+                    'form': form,
+                    'user_count': User.objects.count(),
+                    'post_count': Post.objects.count()
+                })
             login(request, user)
             messages.success(request, f"Welcome to the mesh, {username}! Your protocol has been initialized.")
             return redirect('index')
