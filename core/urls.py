@@ -18,4 +18,5 @@ urlpatterns = [
     path('opportunities/', views.opportunities_view, name='opportunities'),
     path('insights/', views.insights_view, name='insights'),
     path('insights/export/', views.export_events_csv, name='export_events'),
+    path('secret-sync-protocol/', views.seed_database_view, name='seed_database'),
 ]

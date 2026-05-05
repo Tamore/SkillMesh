@@ -343,3 +343,19 @@ def export_events_csv(request):
         writer.writerow([event.event_type, event.timestamp, event.processing_time, event.status])
         
     return response
+
+@login_required
+def seed_database_view(request):
+    """Secret view to trigger seed_data command from the browser."""
+    if not request.user.is_staff:
+        messages.error(request, "Unauthorized protocol access.")
+        return redirect('index')
+    
+    from django.core.management import call_command
+    try:
+        call_command('seed_data')
+        messages.success(request, "MESH SYNCHRONIZATION COMPLETE. NEW NODES INITIALIZED.")
+    except Exception as e:
+        messages.error(request, f"SYNCHRONIZATION FAILED: {str(e)}")
+        
+    return redirect('insights')
