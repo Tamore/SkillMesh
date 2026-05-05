@@ -2,14 +2,13 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from core.models import Skill, Post, UserProfile, Event
 import random
-from django.utils import timezone
+from django.db import transaction
 
 class Command(BaseCommand):
     help = 'Seeds the database with a massive diverse SkillMesh population'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write('INITIALIZING MASS POPULATION SEQUENCE...')
-        from django.db import transaction
+        self.stdout.write('INITIALIZING TOTAL MESH OVERLOAD...')
 
         # 1. Define Skills
         protocols = [
@@ -17,30 +16,45 @@ class Command(BaseCommand):
             'UI/UX', 'Distributed Systems', 'PostgreSQL', 'Docker',
             'LLMs', 'Tailwind CSS', 'Framer Motion', 'Web3', 'Cybersecurity',
             'Go', 'Kubernetes', 'Machine Learning', 'Swift', 'C++', 'Node.js',
-            'AWS', 'Terraform', 'GraphQL', 'Next.js', 'Solana'
+            'AWS', 'Terraform', 'GraphQL', 'Next.js', 'Solana', 'WebGL', 'RAG'
         ]
         
         with transaction.atomic():
             for p in protocols:
                 Skill.objects.get_or_create(name=p)
 
-            # 2. Define Personas
+            # 2. The Master Persona List (25+ Nodes)
             personas = [
-                {'username': 'neon_hacker', 'bio': 'Specializing in dark-mode aesthetics and cyber-secure protocols.', 'skills': ['Cybersecurity', 'React', 'Tailwind CSS']},
-                {'username': 'bit_architect', 'bio': 'Building the foundations of the next-gen web. Low-level lover.', 'skills': ['Rust', 'Distributed Systems', 'C++']},
-                {'username': 'rust_rebel', 'bio': 'Safety and speed. Rust is the only way forward.', 'skills': ['Rust', 'Go', 'Docker']},
-                {'username': 'pixel_perfect', 'bio': 'If it is one pixel off, it is broken. UI precision is my religion.', 'skills': ['UI/UX', 'Tailwind CSS', 'Framer Motion']},
-                {'username': 'cloud_weaver', 'bio': 'Orchestrating massive clusters. Kubernetes is my playground.', 'skills': ['Kubernetes', 'AWS', 'Docker']},
-                {'username': 'data_alchemist', 'bio': 'Turning raw data into gold using Python and ML.', 'skills': ['Machine Learning', 'Python', 'PostgreSQL']},
-                {'username': 'solana_surfer', 'bio': 'Riding the waves of high-speed blockchain transactions.', 'skills': ['Solidity', 'Web3', 'Solana']},
-                {'username': 'titan_dev', 'bio': 'Enterprise-scale solutions for massive problems.', 'skills': ['Go', 'PostgreSQL', 'Kubernetes']},
-                {'username': 'orbital_designer', 'bio': 'Creating interfaces that feel like they are from 2050.', 'skills': ['UI/UX', 'Framer Motion', 'React']},
-                {'username': 'syntax_samurai', 'bio': 'Clean code, sharp mind. TypeScript master.', 'skills': ['TypeScript', 'Next.js', 'Node.js']},
-                {'username': 'proto_pilot', 'bio': 'Rapid prototyping and high-speed delivery.', 'skills': ['React', 'Tailwind CSS', 'Node.js']},
-                {'username': 'logic_lord', 'bio': 'Solving the hardest algorithmic challenges.', 'skills': ['C++', 'Python', 'Distributed Systems']},
-                {'username': 'vector_voyager', 'bio': 'Exploring the world of vector databases and RAG.', 'skills': ['LLMs', 'Python', 'PostgreSQL']},
-                {'username': 'cyber_sage', 'bio': 'Wisdom in the world of encryption and security.', 'skills': ['Cybersecurity', 'Go', 'Rust']},
-                {'username': 'mesh_master', 'bio': 'Connecting the nodes of the world.', 'skills': ['Node.js', 'GraphQL', 'TypeScript']}
+                # The Cyber Batch
+                {'username': 'neon_hacker', 'bio': 'Dark-mode aesthetics and cyber-secure protocols.', 'skills': ['Cybersecurity', 'React', 'Tailwind CSS']},
+                {'username': 'bit_architect', 'bio': 'Building low-level foundations.', 'skills': ['Rust', 'Distributed Systems', 'C++']},
+                {'username': 'rust_rebel', 'bio': 'Safety and speed master.', 'skills': ['Rust', 'Go', 'Docker']},
+                {'username': 'pixel_perfect', 'bio': 'UI precision is my religion.', 'skills': ['UI/UX', 'Tailwind CSS', 'Framer Motion']},
+                {'username': 'cloud_weaver', 'bio': 'Orchestrating massive clusters.', 'skills': ['Kubernetes', 'AWS', 'Docker']},
+                {'username': 'data_alchemist', 'bio': 'Turning data into gold.', 'skills': ['Machine Learning', 'Python', 'PostgreSQL']},
+                {'username': 'solana_surfer', 'bio': 'Riding the blockchain waves.', 'skills': ['Solidity', 'Web3', 'Solana']},
+                {'username': 'titan_dev', 'bio': 'Enterprise-scale solutions.', 'skills': ['Go', 'PostgreSQL', 'Kubernetes']},
+                {'username': 'orbital_designer', 'bio': 'Interfaces from the year 2050.', 'skills': ['UI/UX', 'Framer Motion', 'React']},
+                {'username': 'syntax_samurai', 'bio': 'Clean code, sharp mind.', 'skills': ['TypeScript', 'Next.js', 'Node.js']},
+                
+                # The Specialist Batch
+                {'username': 'alex_dev', 'bio': 'Full-stack engineer specializing in high-performance web apps.', 'skills': ['React', 'Node.js', 'PostgreSQL']},
+                {'username': 'sarah_cloud', 'bio': 'Cloud Architect focused on serverless and scalability.', 'skills': ['AWS', 'Docker', 'Kubernetes']},
+                {'username': 'mike_ops', 'bio': 'DevOps wizard making deployments smooth as silk.', 'skills': ['Docker', 'Terraform', 'Go']},
+                {'username': 'jenny_ai', 'bio': 'AI Researcher exploring the limits of LLMs.', 'skills': ['Python', 'LLMs', 'Machine Learning']},
+                {'username': 'ethan_rust', 'bio': 'Low-level enthusiast building safe systems.', 'skills': ['Rust', 'C++', 'Distributed Systems']},
+                {'username': 'lila_design', 'bio': 'Visual storyteller and UI/UX artisan.', 'skills': ['UI/UX', 'Framer Motion', 'Tailwind CSS']},
+                {'username': 'marcus_backend', 'bio': 'Data engineer optimizing queries for breakfast.', 'skills': ['PostgreSQL', 'Python', 'Go']},
+                {'username': 'zoe_frontend', 'bio': 'Creating immersive web experiences.', 'skills': ['TypeScript', 'React', 'Next.js']},
+                {'username': 'leo_security', 'bio': 'Defending the mesh from intrusions.', 'skills': ['Cybersecurity', 'Go', 'Docker']},
+                {'username': 'maya_web3', 'bio': 'Decentralizing the world, one block at a time.', 'skills': ['Solidity', 'Web3', 'GraphQL']},
+
+                # The Hybrid Batch
+                {'username': 'vector_voyager', 'bio': 'Exploring RAG and vector search.', 'skills': ['LLMs', 'RAG', 'PostgreSQL']},
+                {'username': 'proto_pilot', 'bio': 'Rapid prototyping specialist.', 'skills': ['React', 'Tailwind CSS', 'Node.js']},
+                {'username': 'logic_lord', 'bio': 'Solving algorithmic nightmares.', 'skills': ['C++', 'Python', 'Distributed Systems']},
+                {'username': 'mesh_master', 'bio': 'Connecting the world nodes.', 'skills': ['Node.js', 'GraphQL', 'TypeScript']},
+                {'username': 'gl_warrior', 'bio': 'Visualizing the matrix in 3D.', 'skills': ['WebGL', 'TypeScript', 'React']}
             ]
 
             created_count = 0
@@ -57,21 +71,13 @@ class Command(BaseCommand):
                     profile.save()
                     
                     for s_name in p['skills']:
-                        skill = Skill.objects.get(name=s_name)
+                        skill, _ = Skill.objects.get_or_create(name=s_name)
                         profile.skills.add(skill)
                     
                     Post.objects.create(
                         user=user,
-                        content=f"Greetings Mesh! I am {p['username']}, focusing on {p['skills'][0]}. Excited to connect.",
+                        content=f"Initial signal broadcast from {p['username']}. Specializing in {p['skills'][0]}. System online.",
                         post_type='general'
                     )
 
-                    Event.objects.create(
-                        event_type='IdentityCreated',
-                        status='success',
-                        processing_time=random.randint(50, 200)
-                    )
-
-        self.stdout.write(self.style.SUCCESS(f'MASS POPULATION COMPLETE: {created_count} NEW NODES INITIALIZED.'))
-
-        self.stdout.write(self.style.SUCCESS(f'MASS POPULATION COMPLETE: {created_count} NEW NODES INITIALIZED.'))
+        self.stdout.write(self.style.SUCCESS(f'TOTAL OVERLOAD COMPLETE: {created_count} NEW NODES INITIALIZED.'))

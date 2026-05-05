@@ -74,3 +74,17 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.event_type} - {self.status} ({self.timestamp})"
+
+# --- SIGNALS ---
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def log_user_creation(sender, instance, created, **kwargs):
+    """Automatically log an event when a new identity node is initialized."""
+    if created:
+        Event.objects.create(
+            event_type='IdentityCreated',
+            status='success',
+            processing_time=150.0  # Estimated protocol latency
+        )
