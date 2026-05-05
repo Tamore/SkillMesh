@@ -144,10 +144,19 @@ AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', default=None)
 AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', default=None)
 AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default=None)
 AWS_S3_ENDPOINT_URL = env('AWS_S3_ENDPOINT_URL', default=None)
-AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='us-east-1')
-AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='ap-northeast-2')
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_QUERYSTRING_AUTH = False
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+
+# Construct the public Supabase URL domain
+if AWS_S3_ENDPOINT_URL and AWS_STORAGE_BUCKET_NAME:
+    try:
+        project_id = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
+        AWS_S3_CUSTOM_DOMAIN = f"{project_id}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+    except:
+        AWS_S3_CUSTOM_DOMAIN = None
 
 # Use S3 if credentials are provided, otherwise fallback to local filesystem
 if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
