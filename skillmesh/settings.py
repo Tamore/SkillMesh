@@ -101,6 +101,8 @@ WSGI_APPLICATION = 'skillmesh.wsgi.application'
 DATABASES = {
     'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3')
 }
+# Performance: Keep database connections alive
+DATABASES['default']['CONN_MAX_AGE'] = 600
 
 
 # Password validation
