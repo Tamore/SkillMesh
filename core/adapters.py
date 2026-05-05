@@ -11,7 +11,8 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
         email = sociallogin.user.email
         if email:
             try:
-                user = User.objects.get(email=email)
+                # Use filter().first() in case multiple users have the same email
+                user = User.objects.filter(email=email).first()
                 sociallogin.connect(request, user)
             except User.DoesNotExist:
                 pass

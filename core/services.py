@@ -30,8 +30,10 @@ def register_user(username, email, password, bio=""):
     # 1. Create User
     user = User.objects.create_user(username=username, email=email, password=password)
     
-    # 2. Create Profile
-    UserProfile.objects.create(user=user, bio=bio)
+    # 2. Update Profile (Signals usually create the profile automatically)
+    profile, created = UserProfile.objects.get_or_create(user=user)
+    profile.bio = bio
+    profile.save()
     
     # 3. Log Event
     log_event("UserRegistered", start_time)
