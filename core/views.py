@@ -304,12 +304,6 @@ def opportunities_view(request):
     
     return render(request, 'core/opportunities.html', {'posts': posts, 'query': query})
 
-import csv
-from django.http import HttpResponse
-
-from django.db.models.functions import TruncDay
-import json
-
 @login_required
 def insights_view(request):
     """Founder Dashboard to view system event statistics."""

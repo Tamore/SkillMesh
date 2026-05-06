@@ -125,10 +125,10 @@
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {{ chart_labels|safe }},
+            labels: JSON.parse('{{ chart_labels|safe }}'),
             datasets: [{
                 label: 'System Events',
-                data: {{ chart_values|safe }},
+                data: JSON.parse('{{ chart_values|safe }}'),
                 borderColor: '#ec4899',
                 backgroundColor: gradient,
                 fill: true,

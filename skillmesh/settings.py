@@ -103,6 +103,7 @@ DATABASES = {
 }
 # Performance: Keep database connections alive
 DATABASES['default']['CONN_MAX_AGE'] = 0
+DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
 
 
 # Password validation
