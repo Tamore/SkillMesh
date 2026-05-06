@@ -104,4 +104,44 @@ class Command(BaseCommand):
                             status='success'
                         )
 
-        self.stdout.write(self.style.SUCCESS(f'TIME-TRAVEL COMPLETE: {created_count} HISTORICAL NODES INITIALIZED.'))
+            # Phase 2: Academic Consistency Simulation (5-day window)
+            for day in [4, 3, 2, 1, 0]:
+                target_date = now - timedelta(days=day)
+                for i in range(5): # 5 users per day
+                    username = f"research_node_{day}_{i}"
+                    user, created = User.objects.get_or_create(username=username)
+                    if created:
+                        user.date_joined = target_date
+                        user.email = f"{username}@mesh.online"
+                        user.save()
+                        created_count += 1
+                        
+                        # Initial Identity Sync
+                        Event.objects.create(
+                            event_type='IdentityCreated',
+                            timestamp=target_date + timedelta(hours=random.randint(0, 4)),
+                            processing_time=random.uniform(100, 250),
+                            status='success'
+                        )
+
+                        # Steady Interaction Stream (4-6 events per day per user)
+                        for p_idx in range(random.randint(4, 6)):
+                            interaction_time = target_date + timedelta(hours=random.randint(5, 23))
+                            Event.objects.create(
+                                event_type='PostCreated',
+                                timestamp=interaction_time,
+                                processing_time=random.uniform(50, 150),
+                                status='success'
+                            )
+                        
+                        # Occasional System Updates
+                        if random.random() > 0.4:
+                            update_time = target_date + timedelta(hours=random.randint(5, 23))
+                            Event.objects.create(
+                                event_type='ProfileUpdated',
+                                timestamp=update_time,
+                                processing_time=random.uniform(30, 80),
+                                status='success'
+                            )
+
+        self.stdout.write(self.style.SUCCESS(f'ACADEMIC RE-BALANCE COMPLETE: {created_count} STABLE NODES GENERATED.'))

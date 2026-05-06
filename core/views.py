@@ -1,10 +1,18 @@
-from django.shortcuts import render, redirect
+import os
+import json
+import csv
+from django.db.models.functions import TruncDay
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db import models
+from django.core.paginator import Paginator
+from django.db.models.functions import TruncDay
+from django.http import HttpResponse, JsonResponse
 from .services import register_user, update_profile, add_skill_to_user, create_post, send_message, search_users_by_skill
 from .forms import ProfileForm, SkillForm, PostForm, MessageForm, CustomUserCreationForm, UserUpdateForm
 from .models import Post, Message, UserProfile, Event, Comment, SavedPost
@@ -17,6 +25,8 @@ def index(request):
     post_count = Post.objects.count()
     saved_post_ids = []
     if request.user.is_authenticated:
+        # Ensure profile exists to prevent crashes
+        UserProfile.objects.get_or_create(user=request.user)
         saved_post_ids = SavedPost.objects.filter(user=request.user).values_list('post_id', flat=True)
 
     return render(request, 'core/index.html', {
@@ -24,6 +34,33 @@ def index(request):
         'user_count': user_count,
         'post_count': post_count,
         'saved_post_ids': saved_post_ids
+    })
+
+@login_required
+def insights_view(request):
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    # Aggregated Chart Data
+    chart_data = Event.objects.annotate(day=TruncDay('timestamp')).values('day').annotate(count=models.Count('id')).order_by('day')
+    chart_labels = [d['day'].strftime('%b %d') for d in chart_data]
+    chart_values = [d['count'] for d in chart_data]
+
+    # Paginated Event Table
+    event_list = Event.objects.all().order_by('-timestamp')
+    paginator = Paginator(event_list, 15) # 15 entries per page
+    page_number = request.GET.get('page')
+    events = paginator.get_page(page_number)
+
+    avg_time = Event.objects.aggregate(models.Avg('processing_time'))['processing_time__avg'] or 0
+    total_events = Event.objects.count()
+    
+    return render(request, 'core/insights.html', {
+        'events': events,
+        'chart_labels': json.dumps(chart_labels),
+        'chart_values': json.dumps(chart_values),
+        'avg_time': round(avg_time, 1),
+        'total_events': total_events
     })
 
 from django.contrib import messages
