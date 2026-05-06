@@ -36,8 +36,8 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-h%04!5lm$m2s$#tzo&u%c&j0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=['http://localhost', 'http://127.0.0.1'])
+ALLOWED_HOSTS = ['skillmesh.online', 'www.skillmesh.online', 'skillmesh-mbuv.onrender.com', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://skillmesh.online', 'https://www.skillmesh.online', 'https://skillmesh-mbuv.onrender.com']
 
 
 # Application definition
