@@ -307,6 +307,9 @@ def opportunities_view(request):
 import csv
 from django.http import HttpResponse
 
+from django.db.models.functions import TruncDay
+import json
+
 @login_required
 def insights_view(request):
     """Founder Dashboard to view system event statistics."""
@@ -323,12 +326,23 @@ def insights_view(request):
     success_rate = (success_count / total_events * 100) if total_events > 0 else 0
     failure_rate = (failure_count / total_events * 100) if total_events > 0 else 0
     
+    # Chart Data: Group by Day for the last 7 days
+    daily_events = Event.objects.annotate(day=TruncDay('timestamp'))\
+                               .values('day')\
+                               .annotate(count=models.Count('id'))\
+                               .order_by('day')
+    
+    chart_labels = [d['day'].strftime('%b %d') for d in daily_events]
+    chart_values = [d['count'] for d in daily_events]
+
     return render(request, 'core/insights.html', {
-        'events': events[:50], # Show last 50 events
+        'events': events[:50],
         'total_events': total_events,
         'success_rate': round(success_rate, 1),
         'failure_rate': round(failure_rate, 1),
-        'avg_time': round(avg_time, 2)
+        'avg_time': round(avg_time, 2),
+        'chart_labels': json.dumps(chart_labels),
+        'chart_values': json.dumps(chart_values),
     })
 
 @login_required
