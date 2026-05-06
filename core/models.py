@@ -62,13 +62,15 @@ class Message(models.Model):
     def __str__(self):
         return f"From {self.sender.username} to {self.receiver.username} at {self.timestamp}"
 
+from django.utils import timezone
+
 class Event(models.Model):
     STATUS_CHOICES = (
         ('success', 'Success'),
         ('failure', 'Failure'),
     )
     event_type = models.CharField(max_length=100)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(default=timezone.now)
     processing_time = models.FloatField()  # in milliseconds
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='success')
 
@@ -87,4 +89,24 @@ def log_user_creation(sender, instance, created, **kwargs):
             event_type='IdentityCreated',
             status='success',
             processing_time=150.0  # Estimated protocol latency
+        )
+
+@receiver(post_save, sender=Post)
+def log_post_creation(sender, instance, created, **kwargs):
+    """Automatically log an event when a new signal is broadcast."""
+    if created:
+        Event.objects.create(
+            event_type='PostCreated',
+            status='success',
+            processing_time=85.0
+        )
+
+@receiver(post_save, sender=UserProfile)
+def log_profile_update(sender, instance, created, **kwargs):
+    """Automatically log an event when a profile node is modified."""
+    if not created:
+        Event.objects.create(
+            event_type='ProfileUpdated',
+            status='success',
+            processing_time=45.0
         )
