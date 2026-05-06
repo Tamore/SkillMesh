@@ -132,9 +132,20 @@
             {% endif %}
         </section>
 
+        <!-- Tab Switcher -->
+        <div class="flex gap-8 border-b border-gray-800 px-2">
+            <button onclick="switchTab('signals')" id="signals-tab" class="pb-4 text-xs font-800 uppercase tracking-widest text-primary-container border-b-2 border-primary-container transition-all">
+                Broadcast Signals
+            </button>
+            {% if user == profile.user %}
+            <button onclick="switchTab('saved')" id="saved-tab" class="pb-4 text-xs font-800 uppercase tracking-widest text-gray-500 hover:text-white transition-all">
+                Saved Vault
+            </button>
+            {% endif %}
+        </div>
+
         <!-- Signal History (Recent Posts) -->
-        <section class="space-y-6">
-            <h3 class="text-xl font-sora font-800 text-white px-2">Signal History</h3>
+        <section id="signals-content" class="space-y-6">
             {% for post in profile.user.posts.all|dictsortreversed:"created_at" %}
                 <article class="bg-gray-900/40 border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-colors group">
                     <div class="flex items-center justify-between mb-4">
@@ -190,10 +201,69 @@
                 </div>
             {% endfor %}
         </section>
+
+        <!-- Saved Posts Section -->
+        {% if user == profile.user %}
+        <section id="saved-content" class="hidden space-y-6">
+            {% for saved in saved_posts %}
+                <article class="bg-gray-900/40 border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-colors group">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-primary-container/20 flex items-center justify-center text-[10px] font-800 text-primary-container">
+                                    {{ saved.post.user.username|first|upper }}
+                                </div>
+                                <span class="text-xs font-800 text-white">{{ saved.post.user.username }}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 font-600 uppercase tracking-widest">{{ saved.post.created_at|date:"M d" }}</p>
+                        </div>
+                        <a href="{% url 'toggle_save' saved.post.id %}" class="text-primary-container hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined filled">bookmark</span>
+                        </a>
+                    </div>
+                    <div class="text-gray-400 leading-relaxed prose prose-invert max-w-none mb-4">
+                        {{ saved.post.content|linebreaks }}
+                    </div>
+                    <div class="flex gap-2">
+                        {% for skill in saved.post.related_skills.all %}
+                            <span class="text-[10px] font-700 text-gray-600 uppercase tracking-wider">#{{ skill.name }}</span>
+                        {% endfor %}
+                    </div>
+                </article>
+            {% empty %}
+                <div class="py-12 text-center text-gray-600 border border-dashed border-gray-800 rounded-2xl">
+                    <span class="material-symbols-outlined text-4xl mb-4 opacity-20">bookmark</span>
+                    <p class="text-sm italic">The vault is empty. No signals indexed yet.</p>
+                </div>
+            {% endfor %}
+        </section>
+        {% endif %}
     </main>
 </div>
 
 <script>
+    function switchTab(tab) {
+        const signalsTab = document.getElementById('signals-tab');
+        const savedTab = document.getElementById('saved-tab');
+        const signalsContent = document.getElementById('signals-content');
+        const savedContent = document.getElementById('saved-content');
+
+        if (tab === 'signals') {
+            signalsTab.classList.add('text-primary-container', 'border-b-2', 'border-primary-container');
+            signalsTab.classList.remove('text-gray-500');
+            savedTab.classList.remove('text-primary-container', 'border-b-2', 'border-primary-container');
+            savedTab.classList.add('text-gray-500');
+            signalsContent.classList.remove('hidden');
+            savedContent.classList.add('hidden');
+        } else {
+            savedTab.classList.add('text-primary-container', 'border-b-2', 'border-primary-container');
+            savedTab.classList.remove('text-gray-500');
+            signalsTab.classList.remove('text-primary-container', 'border-b-2', 'border-primary-container');
+            signalsTab.classList.add('text-gray-500');
+            savedContent.classList.remove('hidden');
+            signalsContent.classList.add('hidden');
+        }
+    }
     const trigger = document.getElementById('add-skill-trigger');
     const form = document.getElementById('skill-form');
     if (trigger && form) {

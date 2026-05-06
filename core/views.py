@@ -164,7 +164,16 @@ def profile_view(request):
             return redirect('index')
     else:
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, 'core/profile.html', {'profile': profile})
+    
+    # Fetch saved posts specifically for this user
+    saved_posts = []
+    if request.user.is_authenticated and request.user == profile.user:
+        saved_posts = SavedPost.objects.filter(user=request.user).select_related('post', 'post__user').order_by('-created_at')
+
+    return render(request, 'core/profile.html', {
+        'profile': profile,
+        'saved_posts': saved_posts
+    })
 
 @login_required
 def edit_profile(request):
