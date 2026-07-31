@@ -1,0 +1,1 @@
+{ "builds": [ { "src": "skillmesh/wsgi.py", "use": "@vercel/python" } ], "routes": [ { "src": "/(.*)", "dest": "skillmesh/wsgi.py" } ] }

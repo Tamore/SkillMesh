@@ -102,11 +102,11 @@ DATABASES = {
     'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3')
 }
 # Performance: Keep database connections alive
-DATABASES['default']['CONN_MAX_AGE'] = 0
-DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
-DATABASES['default']['OPTIONS'] = {
-    'connect_timeout': 10,
-}
+# DATABASES['default']['CONN_MAX_AGE'] = 0
+# DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+# DATABASES['default']['OPTIONS'] = {
+#     'connect_timeout': 10,
+# }
 
 
 # Password validation
