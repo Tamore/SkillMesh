@@ -5,6 +5,16 @@
   <img src="docs/logo_official.png" alt="SkillMesh Official Logo" width="800">
 </div>
 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20059940.svg)](https://doi.org/10.5281/zenodo.20059940)
+
+**SkillMesh** is a high-performance talent discovery mesh and distributed observability framework.
+- **Published Paper (v1):** [DOI 10.5281/zenodo.20059940](https://doi.org/10.5281/zenodo.20059940) (*SkillMesh: Analyzing Event-Driven Workflows in a Centralized Application Environment*)
+- **Research Paper Draft (v2):** [SKILLMESH_V2_RESEARCH_PAPER_DRAFT.md](SKILLMESH_V2_RESEARCH_PAPER_DRAFT.md)
+- **Operator Manual:** [SKILLMESH_V2_OPERATOR_MANUAL.md](SKILLMESH_V2_OPERATOR_MANUAL.md)
+
+---
+
 **SkillMesh** is a professional-grade talent discovery platform built for the modern technical workforce. It moves beyond standard social networking by focusing on **Skills as the Primary Asset**, using a high-fidelity "Stitch-inspired" UI to facilitate seamless connections between innovators, engineers, and founders.
 
 ---
