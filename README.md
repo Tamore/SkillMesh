@@ -10,7 +10,6 @@
 
 **SkillMesh** is a high-performance talent discovery mesh and distributed observability framework.
 - **Published Paper (v1):** [DOI 10.5281/zenodo.20059940](https://doi.org/10.5281/zenodo.20059940) (*SkillMesh: Analyzing Event-Driven Workflows in a Centralized Application Environment*)
-- **Research Paper Draft (v2):** [SKILLMESH_V2_RESEARCH_PAPER_DRAFT.md](SKILLMESH_V2_RESEARCH_PAPER_DRAFT.md)
 - **Operator Manual:** [SKILLMESH_V2_OPERATOR_MANUAL.md](SKILLMESH_V2_OPERATOR_MANUAL.md)
 
 ---
