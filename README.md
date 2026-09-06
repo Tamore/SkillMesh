@@ -10,7 +10,6 @@
 
 **SkillMesh** is a high-performance talent discovery mesh and distributed observability framework.
 - **Published Paper (v1):** [DOI 10.5281/zenodo.20059940](https://doi.org/10.5281/zenodo.20059940) (*SkillMesh: Analyzing Event-Driven Workflows in a Centralized Application Environment*)
-- **Operator Manual:** [SKILLMESH_V2_OPERATOR_MANUAL.md](SKILLMESH_V2_OPERATOR_MANUAL.md)
 
 ---
 
@@ -34,11 +33,14 @@
 
 SkillMesh is built with a robust, event-driven architecture designed for scalability and performance.
 
-### **The Backend Engine**
-- **Django (Python)**: The core framework for business logic and data orchestration.
+### **The Backend Engine & Microservices (v1 + v2)**
+- **Django (Python)**: Core framework for web business logic and Vercel serverless deployment.
+- **FastAPI (Python)**: High-performance microservice Coordinator node handling asynchronous task dispatching.
+- **Redis Streams**: Decoupled event bus (skillmesh:events) for inter-service message passing.
+- **OpenTelemetry SDK**: W3C TraceContext context propagation injecting microsecond TraceID & SpanID across container hops.
 - **Supabase (PostgreSQL)**: Distributed cloud database for high-availability data persistence.
-- **django-allauth**: Enterprise-grade authentication handling OAuth2 handshakes.
-- **Cryptography & PyJWT**: Secure token-based identity verification.
+- **Docker & Docker Compose**: Containerized multi-node cluster orchestration for worker node swarms.
+- **django-allauth & PyJWT**: Secure authentication and identity verification.
 
 ### **The Frontend (Stitch-Inspired)**
 - **Tailwind CSS**: A utility-first CSS framework for custom premium components.
