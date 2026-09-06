@@ -158,27 +158,3 @@ python manage.py runserver
 ```
 
 ---
-
-## 📐 Architecture Overview
-
-SkillMesh follows a **Service Layer Pattern**, separating complex business logic from the UI views. This ensures the code is:
-- **Testable**: Logic is decoupled from HTTP requests.
-- **Maintainable**: Clear separation of concerns between database, logic, and presentation.
-- **Event-Aware**: The system tracks interaction events (like search queries and post updates) for analytical insights.
-
----
-
-## 🎨 Design Philosophy
-
-The SkillMesh aesthetic is heavily inspired by the **Stitch design system**, focusing on:
-- **High Contrast**: Deep grays (`#000000` to `#111111`) paired with vibrant neon accents.
-- **Frictionless UI**: Minimizing clicks via one-click logins and auto-profile generation.
-- **Editorial Layouts**: Using premium typography and generous spacing to make technical information scannable and beautiful.
-
----
-
-## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-*Created with passion for the technical community.*
