@@ -141,3 +141,25 @@ SkillMesh has evolved from a single-node web application into a **Distributed Mi
 - **⏱️ OpenTelemetry Distributed Tracing:** W3C TraceContext serialization injecting TraceID & SpanID across microservice container hops for microsecond per-hop latency tracking.
 - **💓 Self-Healing Heartbeat Protocol:** Non-blocking heartbeat pings (skillmesh:heartbeats) with automatic node crash detection and task re-queueing within 4 seconds.
 - **🌐 Serverless Telemetry API:** Live endpoints (/api/v2/cluster-status/ and /api/v2/dispatch/).
+
+
+## 🚀 Evolution to SkillMesh v2: Distributed Systems Architecture
+
+SkillMesh has evolved from a single-node application into a **Distributed Event-Driven Observability Framework** designed to benchmark microsecond multi-agent telemetry and fault-tolerant coordination:
+
+### 1. 🐳 Multi-Container Microservice Architecture
+- **Worker Swarm Decoupling:** Instead of running all execution within a single monolith, SkillMesh v2 decouples workloads across containerized microservices:
+  - **Coordinator Node (services/coordinator):** Manages task scheduling, W3C trace context generation, and API dispatching.
+  - **Inference Worker (Worker-Alpha):** Isolated container worker processing task workloads asynchronously.
+  - **State Memory Worker (Worker-Beta):** Dedicated worker managing state persistence and memory streams.
+
+### 2. 📡 Redis Streams Asynchronous Event Bus
+- **Decoupled Messaging:** Replaced synchronous internal queues with a high-throughput **Redis Streams** event bus (skillmesh:events), enabling non-blocking pub/sub communication between microservices.
+
+### 3. ⏱️ OpenTelemetry Microsecond Tracing
+- **W3C Context Propagation:** Injects OpenTelemetry TraceID and SpanID directly into Redis event headers.
+- **Per-Hop Latency Measurement:** As tasks move across containers, workers extract trace context and log precise microsecond traversal latency ($\Delta t = t_{\text{receive}} - t_{\text{dispatch}}$) to OpenTelemetry / Jaeger.
+
+### 4. 💓 Self-Healing Heartbeat & Fault Tolerance
+- **Automated Node Health Monitoring:** Worker nodes emit periodic heartbeat frames every 2 seconds to skillmesh:heartbeats.
+- **Node Crash Detection:** If a container fails to ping within 4 seconds, the Coordinator flags the node as UNHEALTHY and automatically re-queues unacknowledged tasks.
