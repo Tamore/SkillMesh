@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  redis-bus:
+    image: redis:7-alpine
+    container_name: skillmesh-redis-bus
+    ports:
+      - '6379:6379'
+    networks:
+      - skillmesh-net
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  jaeger-tracer:
+    image: jaegertracing/all-in-one:latest
+    container_name: skillmesh-jaeger
+    ports:
+      - '16686:16686'
+      - '4317:4317'
+      - '4318:4318'
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - skillmesh-net
+
+  coordinator:
+    build:
+      context: ./services/coordinator
+    container_name: skillmesh-coordinator
+    ports:
+      - '8000:8000'
+    environment:
+      - REDIS_HOST=redis-bus
+      - REDIS_PORT=6379
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger-tracer:4318
+      - NODE_NAME=Coordinator-Main
+    depends_on:
+      redis-bus:
+        condition: service_healthy
+      jaeger-tracer:
+        condition: service_started
+    networks:
+      - skillmesh-net
+
+  worker-alpha:
+    build:
+      context: ./services/worker_node
+    container_name: skillmesh-worker-alpha
+    environment:
+      - REDIS_HOST=redis-bus
+      - REDIS_PORT=6379
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger-tracer:4318
+      - NODE_ID=Worker-Alpha
+      - NODE_ROLE=Inference-Simulator
+    depends_on:
+      redis-bus:
+        condition: service_healthy
+    networks:
+      - skillmesh-net
+
+  worker-beta:
+    build:
+      context: ./services/worker_node
+    container_name: skillmesh-worker-beta
+    environment:
+      - REDIS_HOST=redis-bus
+      - REDIS_PORT=6379
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger-tracer:4318
+      - NODE_ID=Worker-Beta
+      - NODE_ROLE=State-Store
+    depends_on:
+      redis-bus:
+        condition: service_healthy
+    networks:
+      - skillmesh-net
+
+networks:
+  skillmesh-net:
+    driver: bridge
