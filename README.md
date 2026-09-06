@@ -16,7 +16,7 @@
 
 ## 🏛️ System Architecture & Distributed Flow
 
-`mermaid
+``mermaid
 graph TD
     subgraph CLIENT[CLIENT & OBSERVABILITY LAYER]
         WebHUD[SkillMesh Web Dashboard / 3D Topology HUD]
@@ -39,9 +39,7 @@ graph TD
 
     RedisBus -->|4. Real-time Stream| WebHUD
     RedisBus -->|5. Trace Aggregation| Tracer
-`
-
----
+`---
 
 ## 🚀 Evolution to SkillMesh v2: Distributed Systems Architecture
 
