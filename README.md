@@ -11,6 +11,60 @@
 **SkillMesh** is a high-performance talent discovery mesh and distributed observability framework.
 - **Published Paper (v1):** [DOI 10.5281/zenodo.20059940](https://doi.org/10.5281/zenodo.20059940) (*SkillMesh: Analyzing Event-Driven Workflows in a Centralized Application Environment*)
 
+
+---
+
+## 🏛️ System Architecture & Distributed Flow
+
+`mermaid
+graph TD
+    subgraph CLIENT[CLIENT & OBSERVABILITY LAYER]
+        WebHUD[SkillMesh Web Dashboard / 3D Topology HUD]
+        Tracer[OpenTelemetry / Jaeger Distributed Tracer]
+    end
+
+    subgraph BUS[MESSAGING & EVENT BUS LAYER]
+        RedisBus[Redis Streams Event Bus]
+    end
+
+    subgraph WORKERS[DISTRIBUTED WORKER NODES]
+        Coord[Coordinator Node<br/>Dispatcher & OTel Injector]
+        WorkerA[Worker Alpha<br/>Inference Simulator]
+        WorkerB[Worker Beta<br/>State Storage]
+    end
+
+    Coord -->|1. Publish Task + TraceID| RedisBus
+    RedisBus -->|2. Consume & Process| WorkerA
+    WorkerB -->|3. Heartbeat Pings| RedisBus
+
+    RedisBus -->|4. Real-time Stream| WebHUD
+    RedisBus -->|5. Trace Aggregation| Tracer
+`
+
+---
+
+## 🚀 Evolution to SkillMesh v2: Distributed Systems Architecture
+
+SkillMesh has evolved from a single-node application into a **Distributed Event-Driven Observability Framework** designed to benchmark microsecond multi-agent telemetry and fault-tolerant coordination:
+
+### 1. 🐳 Multi-Container Microservice Architecture
+- **Worker Swarm Decoupling:** Instead of running all execution within a single monolith, SkillMesh v2 decouples workloads across containerized microservices:
+  - **Coordinator Node (services/coordinator):** Manages task scheduling, W3C trace context generation, and API dispatching.
+  - **Inference Worker (Worker-Alpha):** Isolated container worker processing task workloads asynchronously.
+  - **State Memory Worker (Worker-Beta):** Dedicated worker managing state persistence and memory streams.
+
+### 2. 📡 Redis Streams Asynchronous Event Bus
+- **Decoupled Messaging:** Replaced synchronous internal queues with a high-throughput **Redis Streams** event bus (skillmesh:events), enabling non-blocking pub/sub communication between microservices.
+
+### 3. ⏱️ OpenTelemetry Microsecond Tracing
+- **W3C Context Propagation:** Injects OpenTelemetry TraceID and SpanID directly into Redis event headers.
+- **Per-Hop Latency Measurement:** As tasks move across containers, workers extract trace context and log precise microsecond traversal latency to OpenTelemetry / Jaeger.
+
+### 4. 💓 Self-Healing Heartbeat & Fault Tolerance
+- **Automated Node Health Monitoring:** Worker nodes emit periodic heartbeat frames every 2 seconds to skillmesh:heartbeats.
+- **Node Crash Detection:** If a container fails to ping within 4 seconds, the Coordinator flags the node as UNHEALTHY and automatically re-queues unacknowledged tasks.
+
+
 ---
 
 **SkillMesh** is a professional-grade talent discovery platform built for the modern technical workforce. It moves beyond standard social networking by focusing on **Skills as the Primary Asset**, using a high-fidelity "Stitch-inspired" UI to facilitate seamless connections between innovators, engineers, and founders.
@@ -130,36 +184,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 *Created with passion for the technical community.*
-
-
-## ⚡ SkillMesh v2: Distributed Systems & Observability Updates
-
-SkillMesh has evolved from a single-node web application into a **Distributed Microservices Observability Framework**:
-
-- **🐳 Containerized Microservices Cluster:** Multi-node container orchestration (docker-compose.yml) running isolated Coordinator, Inference, and Memory worker nodes.
-- **📡 Redis Streams Event Bus:** High-throughput, decoupled event streaming (skillmesh:events) replacing monolithic in-memory queues.
-- **⏱️ OpenTelemetry Distributed Tracing:** W3C TraceContext serialization injecting TraceID & SpanID across microservice container hops for microsecond per-hop latency tracking.
-- **💓 Self-Healing Heartbeat Protocol:** Non-blocking heartbeat pings (skillmesh:heartbeats) with automatic node crash detection and task re-queueing within 4 seconds.
-- **🌐 Serverless Telemetry API:** Live endpoints (/api/v2/cluster-status/ and /api/v2/dispatch/).
-
-
-## 🚀 Evolution to SkillMesh v2: Distributed Systems Architecture
-
-SkillMesh has evolved from a single-node application into a **Distributed Event-Driven Observability Framework** designed to benchmark microsecond multi-agent telemetry and fault-tolerant coordination:
-
-### 1. 🐳 Multi-Container Microservice Architecture
-- **Worker Swarm Decoupling:** Instead of running all execution within a single monolith, SkillMesh v2 decouples workloads across containerized microservices:
-  - **Coordinator Node (services/coordinator):** Manages task scheduling, W3C trace context generation, and API dispatching.
-  - **Inference Worker (Worker-Alpha):** Isolated container worker processing task workloads asynchronously.
-  - **State Memory Worker (Worker-Beta):** Dedicated worker managing state persistence and memory streams.
-
-### 2. 📡 Redis Streams Asynchronous Event Bus
-- **Decoupled Messaging:** Replaced synchronous internal queues with a high-throughput **Redis Streams** event bus (skillmesh:events), enabling non-blocking pub/sub communication between microservices.
-
-### 3. ⏱️ OpenTelemetry Microsecond Tracing
-- **W3C Context Propagation:** Injects OpenTelemetry TraceID and SpanID directly into Redis event headers.
-- **Per-Hop Latency Measurement:** As tasks move across containers, workers extract trace context and log precise microsecond traversal latency ($\Delta t = t_{\text{receive}} - t_{\text{dispatch}}$) to OpenTelemetry / Jaeger.
-
-### 4. 💓 Self-Healing Heartbeat & Fault Tolerance
-- **Automated Node Health Monitoring:** Worker nodes emit periodic heartbeat frames every 2 seconds to skillmesh:heartbeats.
-- **Node Crash Detection:** If a container fails to ping within 4 seconds, the Coordinator flags the node as UNHEALTHY and automatically re-queues unacknowledged tasks.
