@@ -1,24 +1,36 @@
 # 📄 Research Paper Draft: SkillMesh v2
 
-**Title:** *SkillMesh v2: A Distributed Event-Driven Observability and Fault-Tolerant Coordination Protocol for Multi-Agent AI Runtimes*  
+**Title:** *SkillMesh v2: Scaling Event-Driven Observability from Centralized Web Applications to Distributed Multi-Agent Runtimes*  
 **Author:** Nirmiti R. Tamore  
+**DOI Baseline (Paper 1):** [`10.5281/zenodo.20059940`](https://doi.org/10.5281/zenodo.20059940) (*SkillMesh: Analyzing Event-Driven Workflows in a Centralized Application Environment*)  
 **Target Submission / Research Proposal:** Graduate School of Informatics / Engineering (Kyoto University, Osaka University, Tokyo Institute of Technology)  
 **Date:** September 2026  
 
 ---
 
 ## Abstract
-Modern multi-agent AI systems frequently suffer from high inter-agent communication latency, lack of microsecond-level telemetry, and state desynchronization across distributed processes. In this paper, we introduce **SkillMesh v2**, an open-source distributed event-driven observability protocol built for multi-agent runtimes. SkillMesh v2 decouples task dispatching from execution using containerized worker nodes connected via Redis Streams, while injecting OpenTelemetry (`TraceID` / `SpanID`) context across process boundaries. Furthermore, SkillMesh v2 implements a non-blocking heartbeat protocol for self-healing under node crash conditions. Our empirical benchmark demonstrates sub-millisecond event routing overhead and microsecond trace propagation accuracy.
+In our foundational study (*SkillMesh v1*, DOI: `10.5281/zenodo.20059940`), we evaluated event-driven workflows within a centralized, application-level web environment (`skillmesh.online`). While SkillMesh v1 successfully established structured event logging and preliminary latency profiling at the user interaction layer, modern multi-agent AI execution demands scaling beyond single-node centralized architectures. 
+
+In this paper, we introduce **SkillMesh v2**, expanding our framework into a true **Distributed Multi-Agent Observability Protocol**. SkillMesh v2 decouples task dispatching from worker execution using containerized microservice nodes connected via Redis Streams, while injecting OpenTelemetry (`TraceID` / `SpanID`) context across process boundaries. Furthermore, SkillMesh v2 implements a non-blocking heartbeat protocol for self-healing under node crash conditions. Our empirical benchmark demonstrates sub-millisecond event routing overhead (1.42 ms) and microsecond trace propagation accuracy across containerized microservices.
 
 ---
 
-## 1. Introduction & Motivation
-As AI agent runtimes shift from monolithic prompt chains to distributed multi-agent topologies (e.g. Coordinator-Worker swarms), existing observability frameworks fall short. Standard HTTP logging fails to track asynchronous per-hop latency when tasks are passed between autonomous agents across separate containers.
+## 1. Introduction & Research Evolution
 
-SkillMesh v2 solves three core challenges:
-1. **Asynchronous Context Loss:** Preserving distributed trace context across Redis Stream event queues.
-2. **Per-Hop Latency Visibility:** Measuring exact traversal delay between Coordinator and Worker nodes.
-3. **Fault Tolerance:** Detecting worker node crashes via periodic heartbeat pings and re-queueing orphaned tasks automatically.
+### 1.1 Transition from SkillMesh v1 (Zenodo: 20059940) to v2
+- **SkillMesh v1 (Centralized Baseline):** Focused on application-layer event tracking within a centralized Django web runtime. It proved that structured event logging provides reliable user-interaction telemetry, but was constrained by single-node monolith bottlenecks.
+- **SkillMesh v2 (Distributed Multi-Agent Evolution):** Addresses the key limitation identified in Paper 1 by extending event-driven architecture into distributed containerized multi-agent runtimes.
+
+```text
++------------------------------------------+             +------------------------------------------+
+|          SKILLMESH v1 (PAPER 1)          |             |          SKILLMESH v2 (PAPER 2)          |
+|    DOI: 10.5281/zenodo.20059940          |  ========>  |       DISTRIBUTED MULTI-AGENT SWARM      |
+|                                          |             |                                          |
+| • Centralized Monolith (Django)          |             | • Microservice Docker Containers         |
+| • Application-Layer Event Tracking       |             | • OpenTelemetry W3C Trace Injection      |
+| • User Interaction Telemetry             |             | • Redis Streams & Heartbeat Self-Healing |
++------------------------------------------+             +------------------------------------------+
+```
 
 ---
 
