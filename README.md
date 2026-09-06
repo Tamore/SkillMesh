@@ -128,3 +128,14 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 *Created with passion for the technical community.*
+
+
+## ⚡ SkillMesh v2: Distributed Systems & Observability Updates
+
+SkillMesh has evolved from a single-node web application into a **Distributed Microservices Observability Framework**:
+
+- **🐳 Containerized Microservices Cluster:** Multi-node container orchestration (docker-compose.yml) running isolated Coordinator, Inference, and Memory worker nodes.
+- **📡 Redis Streams Event Bus:** High-throughput, decoupled event streaming (skillmesh:events) replacing monolithic in-memory queues.
+- **⏱️ OpenTelemetry Distributed Tracing:** W3C TraceContext serialization injecting TraceID & SpanID across microservice container hops for microsecond per-hop latency tracking.
+- **💓 Self-Healing Heartbeat Protocol:** Non-blocking heartbeat pings (skillmesh:heartbeats) with automatic node crash detection and task re-queueing within 4 seconds.
+- **🌐 Serverless Telemetry API:** Live endpoints (/api/v2/cluster-status/ and /api/v2/dispatch/).
