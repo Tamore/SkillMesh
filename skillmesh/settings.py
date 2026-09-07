@@ -179,7 +179,10 @@ STORAGES = {
 
 # Media files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+if os.environ.get('VERCEL') or os.environ.get('VERCEL_ENV'):
+    MEDIA_ROOT = '/tmp/media'
+else:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Authentication Redirects
 LOGIN_REDIRECT_URL = 'index'
