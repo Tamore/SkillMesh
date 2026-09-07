@@ -1,160 +1,549 @@
-# SkillMesh 🌐
-### A High-Fidelity Talent Discovery & Collaboration Mesh
+# SkillMesh
 
-<div align="center">
-  <img src="docs/logo_official.png" alt="SkillMesh Official Logo" width="800">
-</div>
+> A technical talent discovery platform and experimental distributed systems prototype for studying event-driven workflows, observability, and reliability.
 
-
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20059940.svg)](https://doi.org/10.5281/zenodo.20059940)
-
-**SkillMesh** is a high-performance talent discovery mesh and distributed observability framework.
-- **Published Paper (v1):** [DOI 10.5281/zenodo.20059940](https://doi.org/10.5281/zenodo.20059940) (*SkillMesh: Analyzing Event-Driven Workflows in a Centralized Application Environment*)
-
+![SkillMesh](https://img.shields.io/badge/SkillMesh-v2-blue)
+![Architecture](https://img.shields.io/badge/Architecture-Event--Driven-success)
+![Python](https://img.shields.io/badge/Backend-Python-yellow)
+![Redis](https://img.shields.io/badge/Event%20Bus-Redis%20Streams-red)
+![OpenTelemetry](https://img.shields.io/badge/Observability-OpenTelemetry-orange)
 
 ---
 
-## 🏛️ System Architecture & Distributed Flow
+## Overview
+
+**SkillMesh** is a technical talent discovery platform designed to connect developers, technical professionals, and opportunities through profiles, skills, networking, and platform interactions.
+
+The project has evolved beyond its original single-application architecture.
+
+**SkillMesh v2** extends the platform with an experimental distributed event-driven system designed to study:
+
+- asynchronous event processing
+- distributed task coordination
+- trace-context propagation
+- microservice communication
+- system observability
+- worker health monitoring
+- fault detection and recovery behavior
+
+The v2 architecture is intended as an experimental systems prototype and research environment for evaluating how distributed application components communicate and behave under event-driven workloads.
+
+> **Important:** SkillMesh v2 currently does not use an LLM or autonomous AI agent system. The distributed workers are system components used to simulate and study asynchronous processing and distributed coordination.
+
+---
+
+# Core Platform Features
+
+SkillMesh provides a technical networking and talent discovery environment with features including:
+
+- **Technical Profiles** — Users can create profiles showcasing their skills and technical background.
+- **Skill-Based Discovery** — Designed to support talent and technical profile exploration.
+- **Broadcast Signaling** — Centralized updates for hiring, opportunities, and technical activity.
+- **System Insights & Analytics** — Event-oriented platform monitoring and interaction tracking.
+- **Secure Handshakes** — Integrated peer-to-peer communication and collaboration mechanisms.
+- **Responsive User Interface** — Interactive frontend experience designed for modern technical users.
+
+---
+
+# SkillMesh v2: Distributed Systems Architecture
+
+SkillMesh v2 introduces an experimental multi-container architecture that separates asynchronous coordination and processing from the primary web application.
+
+The architecture consists of:
+
+- a **Coordinator service**
+- an asynchronous **Redis Streams event bus**
+- distributed **worker nodes**
+- **OpenTelemetry trace propagation**
+- worker heartbeat monitoring
+- fault detection mechanisms
+- distributed trace visualization through Jaeger
+
+The system is designed to experiment with end-to-end event tracking across independently running services.
+
+---
+
+## System Architecture
 
 ```mermaid
-graph TD
-    subgraph CLIENT[CLIENT AND OBSERVABILITY LAYER]
-        WebHUD[SkillMesh Web Dashboard / 3D Topology HUD]
-        Tracer[OpenTelemetry / Jaeger Distributed Tracer]
-    end
+flowchart TD
 
-    subgraph BUS[MESSAGING AND EVENT BUS LAYER]
-        RedisBus[Redis Streams Event Bus]
-    end
+    Client["SkillMesh Web Application"] --> API["Application & API Layer"]
 
-    subgraph WORKERS[DISTRIBUTED WORKER NODES]
-        Coord[Coordinator Node(Dispatcher and OTel Injector)]
-        WorkerA[Worker Alpha(Inference Simulator)]
-        WorkerB[Worker Beta(State Storage)]
-    end
+    API --> Coordinator["Coordinator Service"]
 
-    Coord -->|1. Publish Task + TraceID| RedisBus
-    RedisBus -->|2. Consume & Process| WorkerA
-    WorkerB -->|3. Heartbeat Pings| RedisBus
+    Coordinator -->|"Publish Event + Trace Context"| Redis["Redis Streams"]
 
-    RedisBus -->|4. Real-time Stream| WebHUD
-    RedisBus -->|5. Trace Aggregation| Tracer
-`---
+    Redis -->|"Consume Event"| WorkerA["Worker Alpha"]
+    Redis -->|"Consume Event"| WorkerB["Worker Beta"]
 
-## 🚀 Evolution to SkillMesh v2: Distributed Systems Architecture
+    WorkerA -->|"Processing Events"| Redis
+    WorkerB -->|"State / Processing Events"| Redis
 
-SkillMesh has evolved from a single-node application into a **Distributed Event-Driven Observability Framework** designed to benchmark microsecond multi-agent telemetry and fault-tolerant coordination:
+    WorkerA -->|"Telemetry"| OTel["OpenTelemetry"]
+    WorkerB -->|"Telemetry"| OTel
+    Coordinator -->|"Telemetry"| OTel
 
-### 1. 🐳 Multi-Container Microservice Architecture
-- **Worker Swarm Decoupling:** Instead of running all execution within a single monolith, SkillMesh v2 decouples workloads across containerized microservices:
-  - **Coordinator Node (services/coordinator):** Manages task scheduling, W3C trace context generation, and API dispatching.
-  - **Inference Worker (Worker-Alpha):** Isolated container worker processing task workloads asynchronously.
-  - **State Memory Worker (Worker-Beta):** Dedicated worker managing state persistence and memory streams.
+    OTel --> Jaeger["Jaeger Trace Visualization"]
 
-### 2. 📡 Redis Streams Asynchronous Event Bus
-- **Decoupled Messaging:** Replaced synchronous internal queues with a high-throughput **Redis Streams** event bus (skillmesh:events), enabling non-blocking pub/sub communication between microservices.
+    WorkerA -->|"Heartbeat"| Heartbeats["Heartbeat Stream"]
+    WorkerB -->|"Heartbeat"| Heartbeats
 
-### 3. ⏱️ OpenTelemetry Microsecond Tracing
-- **W3C Context Propagation:** Injects OpenTelemetry TraceID and SpanID directly into Redis event headers.
-- **Per-Hop Latency Measurement:** As tasks move across containers, workers extract trace context and log precise microsecond traversal latency to OpenTelemetry / Jaeger.
+    Heartbeats --> Coordinator
 
-### 4. 💓 Self-Healing Heartbeat & Fault Tolerance
-- **Automated Node Health Monitoring:** Worker nodes emit periodic heartbeat frames every 2 seconds to skillmesh:heartbeats.
-- **Node Crash Detection:** If a container fails to ping within 4 seconds, the Coordinator flags the node as UNHEALTHY and automatically re-queues unacknowledged tasks.
-
+    Coordinator -->|"Health Status"| Monitoring["Cluster Monitoring"]
+```
 
 ---
 
-**SkillMesh** is a professional-grade talent discovery platform built for the modern technical workforce. It moves beyond standard social networking by focusing on **Skills as the Primary Asset**, using a high-fidelity "Stitch-inspired" UI to facilitate seamless connections between innovators, engineers, and founders.
+# Event Flow
+
+The experimental distributed workflow follows the general sequence below:
+
+```text
+Application Event
+       │
+       ▼
+Coordinator Service
+       │
+       │  Inject Trace Context
+       ▼
+Redis Streams Event Bus
+       │
+       ├──────────────► Worker Alpha
+       │                     │
+       │                     ├── Process Event
+       │                     ├── Emit Telemetry
+       │                     └── Send Heartbeat
+       │
+       └──────────────► Worker Beta
+                             │
+                             ├── Process / Store State
+                             ├── Emit Telemetry
+                             └── Send Heartbeat
+
+Telemetry
+       │
+       ▼
+OpenTelemetry
+       │
+       ▼
+Jaeger Trace Visualization
+```
 
 ---
 
-## ✨ Core Features
+# Distributed Components
 
-- **🚀 Instant Identity**: One-click social authentication via Google and GitHub.
-- **🔍 Talent Mesh**: Global search for experts based on specific technical skill sets.
-- **📡 Broadcast Signaling**: A centralized feed for "Hiring," "Open to Work," and general technical updates.
-- **📊 System Insights & Analytics**: A dedicated Founder dashboard for tracking event-driven protocol statistics and exporting research data.
-- **💬 Secure Handshakes**: Integrated peer-to-peer messaging for direct collaboration.
-- **⚡ Precision UX**: Real-time interaction feedback, including global loading states and interactive button protocols.
-- **💎 Editorial Aesthetic**: A custom-built dark-mode design system utilizing Glassmorphism and premium typography.
+## Coordinator Service
 
----
+The Coordinator is responsible for managing event dispatch within the experimental distributed environment.
 
-## 🛠️ The Technical Stack
+Primary responsibilities include:
 
-SkillMesh is built with a robust, event-driven architecture designed for scalability and performance.
-
-### **The Backend Engine & Microservices (v1 + v2)**
-- **Django (Python)**: Core framework for web business logic and Vercel serverless deployment.
-- **FastAPI (Python)**: High-performance microservice Coordinator node handling asynchronous task dispatching.
-- **Redis Streams**: Decoupled event bus (skillmesh:events) for inter-service message passing.
-- **OpenTelemetry SDK**: W3C TraceContext context propagation injecting microsecond TraceID & SpanID across container hops.
-- **Supabase (PostgreSQL)**: Distributed cloud database for high-availability data persistence.
-- **Docker & Docker Compose**: Containerized multi-node cluster orchestration for worker node swarms.
-- **django-allauth & PyJWT**: Secure authentication and identity verification.
-
-### **The Frontend (Stitch-Inspired)**
-- **Tailwind CSS**: A utility-first CSS framework for custom premium components.
-- **Glassmorphism**: Advanced UI techniques (backdrop filters, opacity layering) for a "Neon Tokyo" look.
-- **Modern Typography**: Inter and Sora font families from Google Fonts.
-- **Interactive JS**: Custom vanilla JavaScript for real-time UI state management.
+- receiving task or event requests
+- generating or propagating trace context
+- publishing events to Redis Streams
+- coordinating worker communication
+- monitoring worker health
+- identifying missing heartbeats
 
 ---
 
-## 🧪 Research Context: Event-Driven System Design
+## Redis Streams Event Bus
 
-SkillMesh is not just a social platform—it is designed as an **experimental system for studying event-driven architectures in digital ecosystems**.
+Redis Streams provides the asynchronous communication layer between distributed services.
 
-### 🔄 Event-Driven Design
-All major user interactions are treated as system events, including:
-- `UserRegistered` • `ProfileUpdated` • `SkillAdded` • `PostCreated` • `MessageSent`
+Events are published to the stream and consumed independently by worker services.
 
-Each event is **Logged**, **Timestamped**, **Measured for Latency**, and **Validated for Status**. This provides a granular audit trail for analyzing system behavior under load.
+This allows the architecture to decouple:
 
-### 📊 Reliability Evaluation
-SkillMesh includes an internal event tracking mechanism that enables:
-- **Latency Measurement**: Tracking event processing speed in milliseconds.
-- **Protocol Health**: Monitoring system success/failure rates.
-- **Workflow Analysis**: Studying execution behavior across distributed components.
-
-### 🎯 Research Alignment
-The platform serves as a **prototype for studying how real-world applications behave under event-driven models**, bridging the gap between theoretical system design and practical implementation in the fields of Distributed Systems and Software Engineering.
+- event producers
+- task coordination
+- worker processing
+- system monitoring
 
 ---
 
-## ⚙️ Installation & Setup
+## Worker Nodes
 
-To initialize your own local SkillMesh instance, follow these protocol steps:
+SkillMesh v2 includes independently running worker services.
 
-### 1. Clone the Protocol
+### Worker Alpha
+
+Worker Alpha consumes events from Redis Streams and performs simulated asynchronous processing.
+
+Its primary purpose is to provide an independent processing node for evaluating:
+
+- event consumption
+- distributed tracing
+- processing flow
+- worker health monitoring
+
+### Worker Beta
+
+Worker Beta operates as an additional distributed worker for state-oriented or secondary event processing.
+
+The presence of multiple worker services allows the system to experiment with:
+
+- multi-node communication
+- asynchronous processing
+- event routing
+- distributed observability
+
+---
+
+# Observability
+
+SkillMesh v2 uses **OpenTelemetry** to propagate and observe execution context across distributed services.
+
+The architecture is designed to track event flow between:
+
+```text
+Coordinator
+      ↓
+Redis Streams
+      ↓
+Worker Nodes
+```
+
+Trace context can be propagated through asynchronous event payloads, allowing related operations to be associated across service boundaries.
+
+This provides visibility into:
+
+- distributed request flow
+- service-to-service communication
+- processing spans
+- event routing behavior
+- worker activity
+
+---
+
+## Trace Context Propagation
+
+The system is designed around W3C-compatible trace context propagation.
+
+The Coordinator injects trace context into event metadata before the event is published to the Redis Streams bus.
+
+Worker services can then extract the context when processing the event.
+
+This allows related operations to be represented as part of the same distributed trace.
+
+Conceptually:
+
+```text
+Coordinator
+    │
+    │ TraceID + Context
+    ▼
+Redis Event
+    │
+    ▼
+Worker
+    │
+    ▼
+Child Processing Span
+```
+
+---
+
+# Reliability and Health Monitoring
+
+SkillMesh v2 includes an experimental heartbeat mechanism for monitoring worker availability.
+
+Worker services periodically emit heartbeat events to the monitoring stream.
+
+The Coordinator monitors these signals to determine whether a worker is responsive.
+
+The mechanism is intended to support experiments involving:
+
+- worker availability monitoring
+- missing heartbeat detection
+- node failure detection
+- distributed system recovery strategies
+
+> The exact recovery and fault-handling behavior depends on the currently deployed implementation and experimental configuration.
+
+---
+
+# Technology Stack
+
+## Backend and Distributed Services
+
+- **Django** — Core web application framework
+- **FastAPI** — Coordinator and distributed service APIs
+- **Python** — Primary backend and systems programming language
+- **Redis Streams** — Asynchronous event communication
+- **OpenTelemetry** — Distributed tracing and observability
+- **Jaeger** — Trace visualization
+- **Docker** — Service containerization
+- **Docker Compose** — Multi-container orchestration
+
+---
+
+## Application and Data Layer
+
+- **Django** — Core application logic
+- **Supabase** — Application data and backend services
+- **Authentication Components** — User identity and access management
+
+---
+
+## Frontend
+
+- **HTML**
+- **CSS**
+- **JavaScript**
+- **Tailwind CSS**
+
+The frontend provides the user-facing SkillMesh platform interface.
+
+---
+
+# Project Structure
+
+```text
+SkillMesh/
+│
+├── docker-compose.yml
+│
+├── core/
+│   ├── views.py
+│   ├── urls.py
+│   └── ...
+│
+├── services/
+│   │
+│   ├── coordinator/
+│   │   ├── main.py
+│   │   ├── Dockerfile
+│   │   └── requirements.txt
+│   │
+│   └── worker_node/
+│       ├── main.py
+│       ├── Dockerfile
+│       └── requirements.txt
+│
+├── requirements.txt
+├── README.md
+└── ...
+```
+
+> The exact repository structure may evolve as additional services and experiments are added.
+
+---
+
+# Running the Distributed Environment
+
+## Prerequisites
+
+Before running the distributed environment, ensure that you have:
+
+- Python
+- Docker Desktop
+- Docker Compose
+
+installed and available on your system.
+
+---
+
+## Start the Multi-Container Cluster
+
+From the project root:
+
 ```bash
-git clone https://github.com/SkillMesh/skillmesh.git
-cd skillmesh
+docker compose up -d --build
 ```
 
-### 2. Environment Configuration
-Create a `.env` file in the root directory and populate it with your cloud credentials:
-```env
-DEBUG=True
-SECRET_KEY=your_secret_key
-DATABASE_URL=postgres://user:password@db.supabase.co:5432/postgres
+The Docker environment is designed to launch the distributed system components, including:
+
+- Redis
+- Jaeger
+- Coordinator service
+- Worker nodes
+
+---
+
+## Check Running Containers
+
+```bash
+docker compose ps
 ```
 
-### 3. Dependency Initialization
+---
+
+## Stop the Environment
+
+```bash
+docker compose down
+```
+
+---
+
+# Local Development
+
+Clone the repository:
+
+```bash
+git clone <YOUR-REPOSITORY-URL>
+cd SkillMesh
+```
+
+Create and activate a Python virtual environment:
+
+```bash
+python -m venv venv
+```
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+Install project dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Database Migration
-```bash
-python manage.py migrate
-python manage.py seed_data  # Populates the mesh with initial test talent
-```
-
-### 5. Launch the Mesh
-```bash
-python manage.py runserver
-```
+Run the application according to the configured Django project setup.
 
 ---
+
+# Experimental Research Context
+
+SkillMesh v2 serves as an experimental environment for studying distributed event-driven system behavior.
+
+The research focus includes:
+
+- asynchronous event communication
+- distributed service coordination
+- trace propagation across service boundaries
+- observability in asynchronous systems
+- worker health monitoring
+- fault detection
+- reliability evaluation
+
+The platform provides a practical application environment in which distributed systems concepts can be implemented and experimentally evaluated.
+
+---
+
+# Version Evolution
+
+## SkillMesh v1
+
+The initial version focused primarily on the core SkillMesh platform and application functionality.
+
+The system was designed as a more centralized application architecture supporting the platform's user-facing features.
+
+---
+
+## SkillMesh v2
+
+SkillMesh v2 introduces an experimental distributed architecture.
+
+Key additions include:
+
+- multi-container services
+- Coordinator-based event dispatch
+- Redis Streams communication
+- distributed worker nodes
+- OpenTelemetry instrumentation
+- trace-context propagation
+- Jaeger visualization
+- worker heartbeat monitoring
+
+The purpose of v2 is not to replace the SkillMesh platform.
+
+Instead, it extends the project into an experimental distributed systems environment.
+
+---
+
+# Current Scope
+
+SkillMesh v2 currently focuses on:
+
+- distributed systems engineering
+- event-driven communication
+- microservice coordination
+- observability
+- reliability experimentation
+
+The current implementation **does not claim to include autonomous AI agents or LLM-based reasoning**.
+
+Future versions may explore agent-based or AI-assisted workflows, but these are separate from the current v2 implementation.
+
+---
+
+# Research Direction
+
+Future research and development may investigate:
+
+- dynamic worker scaling
+- automated fault recovery
+- distributed scheduling strategies
+- event replay and recovery
+- advanced observability dashboards
+- reliability benchmarking
+- multi-agent system coordination
+
+Any future AI-agent integration will be implemented as a separate system capability rather than being claimed as part of the current v2 architecture.
+
+---
+
+# Deployment
+
+## Main Application
+
+SkillMesh is available as a web application:
+
+**Live Platform:** https://skillmesh.online
+
+The production web application and the experimental distributed Docker environment should be treated as separate deployment contexts.
+
+The distributed services are primarily intended for local experimentation, testing, and research evaluation.
+
+---
+
+# Documentation
+
+Additional project documentation may include:
+
+- architecture documentation
+- deployment guides
+- distributed systems operator manuals
+- experimental methodology
+- benchmark documentation
+- research papers
+
+---
+
+# Author
+
+**Nirmiti R. Tamore**
+
+Technical Engineer | Distributed Systems | Cloud Technology | Event-Driven Architecture
+
+---
+
+# Research Status
+
+SkillMesh is an actively evolving project.
+
+The platform currently combines a functional application with experimental distributed systems research infrastructure.
+
+The focus of ongoing development is to evaluate how event-driven architectures can improve:
+
+- system observability
+- asynchronous coordination
+- reliability monitoring
+- distributed workflow management
+
+---
+
+## License
+
+This project is currently maintained as a personal research and development project.
+
+License information can be added based on the intended future distribution model.
