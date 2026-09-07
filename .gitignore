@@ -11,3 +11,7 @@ env/
 .DS_Store
 
 .idea/
+# Local documentation and research drafts
+SKILLMESH_V2_OPERATOR_MANUAL.md
+SKILLMESH_V2_RESEARCH_PAPER_DRAFT.md
+skillmesh_v2_distributed_systems_architecture.md
