@@ -29,9 +29,9 @@ graph TD
     end
 
     subgraph WORKERS[DISTRIBUTED WORKER NODES]
-        Coord[Coordinator Node<br/>Dispatcher & OTel Injector]
-        WorkerA[Worker Alpha<br/>Inference Simulator]
-        WorkerB[Worker Beta<br/>State Storage]
+        Coord[Coordinator Node(Dispatcher & OTel Injector)]
+        WorkerA[Worker Alpha(Inference Simulator)]
+        WorkerB[Worker Beta(State Storage)]
     end
 
     Coord -->|1. Publish Task + TraceID| RedisBus
