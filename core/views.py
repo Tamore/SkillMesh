@@ -92,7 +92,7 @@ def register_view(request):
                     'user_count': User.objects.count(),
                     'post_count': Post.objects.count()
                 })
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f"Welcome to the mesh, {username}! Your protocol has been initialized.")
             return redirect('index')
         else:
@@ -125,7 +125,7 @@ def login_view(request):
                 pass
         
         if user is not None:
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f"Access granted. Welcome back, {user.username}.")
             next_url = request.POST.get('next') or request.GET.get('next')
             if not next_url or next_url == 'None' or 'login' in next_url:
