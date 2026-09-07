@@ -1,4 +1,5 @@
 import os
+from django.views.decorators.csrf import csrf_exempt
 import json
 import csv
 from django.db.models.functions import TruncDay
