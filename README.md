@@ -17,19 +17,18 @@
 ## 🏛️ System Architecture & Distributed Flow
 
 ```mermaid
-
 graph TD
-    subgraph CLIENT[CLIENT & OBSERVABILITY LAYER]
+    subgraph CLIENT[CLIENT AND OBSERVABILITY LAYER]
         WebHUD[SkillMesh Web Dashboard / 3D Topology HUD]
         Tracer[OpenTelemetry / Jaeger Distributed Tracer]
     end
 
-    subgraph BUS[MESSAGING & EVENT BUS LAYER]
+    subgraph BUS[MESSAGING AND EVENT BUS LAYER]
         RedisBus[Redis Streams Event Bus]
     end
 
     subgraph WORKERS[DISTRIBUTED WORKER NODES]
-        Coord[Coordinator Node(Dispatcher & OTel Injector)]
+        Coord[Coordinator Node(Dispatcher and OTel Injector)]
         WorkerA[Worker Alpha(Inference Simulator)]
         WorkerB[Worker Beta(State Storage)]
     end
