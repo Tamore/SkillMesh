@@ -24,7 +24,10 @@ app = FastAPI(title='SkillMesh v2 Coordinator Node')
 # Redis Connection
 redis_host = os.getenv('REDIS_HOST', 'redis-bus')
 redis_port = int(os.getenv('REDIS_PORT', 6379))
-r = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+try:
+    r = redis.Redis(host=redis_host, port=redis_port, decode_responses=True, socket_connect_timeout=1.0, socket_timeout=1.0)
+except Exception:
+    r = None
 
 class TaskRequest(BaseModel):
     target_role: str = 'Inference-Simulator'
