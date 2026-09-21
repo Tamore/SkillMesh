@@ -1,4 +1,19 @@
-{% extends 'core/base.html' %}
+﻿{% extends 'core/base.html' %}
+
+{% block extra_head %}
+<!-- Cropper.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+<style>
+  .cropper-view-box,
+  .cropper-face {
+    border-radius: 50%;
+  }
+  .cropper-view-box {
+    outline: 2px solid #FF2D55;
+    outline-color: rgba(255, 45, 85, 0.85);
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto animate-fade">
@@ -9,7 +24,7 @@
         <h1 class="text-4xl font-sora font-800 text-white tracking-tighter uppercase">Configure Identity</h1>
     </div>
 
-    <form method="post" enctype="multipart/form-data" class="space-y-8">
+    <form method="post" enctype="multipart/form-data" class="space-y-8" id="profile-form">
         {% csrf_token %}
         <input type="hidden" name="action" value="update_profile">
         
@@ -17,26 +32,42 @@
         <div class="bg-gray-900/40 backdrop-blur-xl border border-gray-800 rounded-3xl p-8 lg:p-12 shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-primary-container/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
             
-            <div class="relative space-y-10">
-                <!-- Username Section -->
-                <div class="space-y-4">
-                    <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Identity Handle (Username)</label>
-                    <div class="relative group">
-                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary-container transition-colors">alternate_email</span>
-                        <input 
-                            type="text" 
-                            name="username" 
-                            value="{{ user_form.username.value }}"
-                            class="w-full bg-black/50 border border-gray-800 rounded-2xl pl-12 pr-6 py-4 text-white placeholder-gray-700 focus:outline-none focus:border-primary-container transition-all"
-                            placeholder="username">
+            <div class="space-y-10 relative z-10">
+                <!-- User Core Information -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-3">
+                        <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Protocol Identifier</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary-container transition-colors">fingerprint</span>
+                            <input 
+                                type="text" 
+                                name="username" 
+                                value="{{ user_form.username.value|default:user.username }}"
+                                class="w-full bg-black/50 border border-gray-800 rounded-2xl pl-12 pr-6 py-4 text-white placeholder-gray-700 focus:outline-none focus:border-primary-container transition-all"
+                                placeholder="Unique username...">
+                        </div>
+                        {% if user_form.username.errors %}
+                            <p class="text-[10px] text-red-500 font-700 uppercase tracking-wider px-1">{{ user_form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Transmission Relays</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-600">mail</span>
+                            <input 
+                                type="text" 
+                                value="{{ user.email }}" 
+                                disabled
+                                class="w-full bg-black/20 border border-gray-800/50 rounded-2xl pl-12 pr-6 py-4 text-gray-600 cursor-not-allowed">
+                        </div>
                     </div>
                 </div>
 
-                <!-- Bio Section -->
-                <div class="space-y-4">
-                    <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Identity Log (Bio)</label>
+                <!-- Objective / Bio Section -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Mission Objective / Bio</label>
                     <div class="relative group">
-                        <div class="absolute -inset-0.5 bg-gradient-to-r from-primary-container/20 to-tertiary/20 rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
                         <textarea 
                             name="bio" 
                             rows="4"
@@ -45,63 +76,45 @@
                     </div>
                 </div>
 
-                <!-- Profile Picture Section -->
+                <!-- Profile Picture Section with Adjust/Crop Ability -->
                 <div class="space-y-4">
                     <label class="block text-xs font-800 text-gray-500 uppercase tracking-[0.2em] px-1">Visual Identifier</label>
                     <div class="flex items-center gap-6 p-6 bg-gray-900/50 border border-gray-800 rounded-2xl">
                         <div class="relative group">
-                            <div id="preview-container" class="w-20 h-20 rounded-2xl overflow-hidden border-2 border-gray-800 group-hover:border-primary-container transition-colors relative">
+                            <div id="preview-container" class="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-800 group-hover:border-primary-container transition-colors relative shadow-xl">
                                 {% if profile.profile_picture %}
-                                    <img id="image-preview" src="{{ profile.profile_picture.url }}" class="w-full h-full object-cover">
+                                    <img id="image-preview" src="{{ profile.profile_picture.url }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" class="w-full h-full object-cover">
+                                    <div style="display: none;" class="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 items-center justify-center text-white text-3xl font-800">
+                                        {{ profile.user.username|first|upper }}
+                                    </div>
                                 {% else %}
                                     <div id="placeholder-preview" class="w-full h-full bg-gray-800 flex items-center justify-center text-gray-600">
                                         <span class="material-symbols-outlined text-4xl">person</span>
                                     </div>
                                     <img id="image-preview" src="#" class="w-full h-full object-cover hidden">
                                 {% endif %}
-                                <div id="upload-overlay" class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity pointer-events-none">
-                                    <span class="material-symbols-outlined text-white text-xl">sync</span>
-                                </div>
                             </div>
                         </div>
                         <div class="flex-1 space-y-3">
-                            <input type="file" name="profile_picture" id="profile_picture" class="hidden" onchange="previewImage(this)">
-                            <div class="flex items-center gap-3">
+                            <input type="file" name="profile_picture" id="profile_picture" accept="image/*" class="hidden">
+                            <div class="flex flex-wrap items-center gap-3">
                                 <label for="profile_picture" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-700 rounded-lg cursor-pointer transition-colors shadow-lg">
                                     <span class="material-symbols-outlined text-sm">upload</span>
-                                    Upload New Protocol Image
+                                    Choose &amp; Adjust Photo
                                 </label>
+                                <button type="button" id="re-adjust-btn" class="hidden inline-flex items-center gap-1.5 px-3 py-2 bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-white text-xs font-700 rounded-lg transition-colors">
+                                    <span class="material-symbols-outlined text-sm">crop</span>
+                                    Re-Crop / Adjust
+                                </button>
                                 <span id="file-status" class="text-[10px] text-primary-container font-800 uppercase tracking-widest hidden flex items-center gap-1">
                                     <span class="material-symbols-outlined text-sm">check_circle</span>
-                                    Selected
+                                    Image Adjusted
                                 </span>
                             </div>
-                            <p class="text-[10px] text-gray-600 uppercase font-600 tracking-wider">Recommended: Square PNG/JPG, max 2MB</p>
+                            <p class="text-[10px] text-gray-600 uppercase font-600 tracking-wider">Crop, zoom, pan &amp; adjust your picture to a clean circular fit</p>
                         </div>
                     </div>
                 </div>
-
-                <script>
-                    function previewImage(input) {
-                        const preview = document.getElementById('image-preview');
-                        const placeholder = document.getElementById('placeholder-preview');
-                        const status = document.getElementById('file-status');
-                        const overlay = document.getElementById('upload-overlay');
-                        
-                        if (input.files && input.files[0]) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                preview.src = e.target.result;
-                                preview.classList.remove('hidden');
-                                if (placeholder) placeholder.classList.add('hidden');
-                                status.classList.remove('hidden');
-                                overlay.classList.add('opacity-100');
-                            }
-                            reader.readAsDataURL(input.files[0]);
-                        }
-                    }
-                </script>
-
 
                 <!-- Status Section -->
                 <div class="space-y-4">
@@ -129,10 +142,9 @@
         </div>
     </form>
 
-    <!-- Security Protocols (Password Rotation) -->
-    <div class="mt-16 space-y-8">
-        <h2 class="text-2xl font-sora font-800 text-white tracking-tighter uppercase px-1">Security Protocols</h2>
-        
+    <!-- Password Rotation Section -->
+    <div class="mt-16">
+        <h2 class="text-2xl font-sora font-800 text-white mb-6 tracking-tight uppercase">Rotate Security Credentials</h2>
         <form method="post" class="bg-gray-900/20 border border-gray-800 rounded-3xl p-8 lg:p-12 space-y-8">
             {% csrf_token %}
             <input type="hidden" name="action" value="change_password">
@@ -147,7 +159,7 @@
                             type="password" 
                             name="{{ field.name }}"
                             class="w-full bg-black/40 border border-gray-800 rounded-2xl pl-12 pr-6 py-4 text-white placeholder-gray-700 focus:outline-none focus:border-tertiary transition-all"
-                            placeholder="••••••••">
+                            placeholder="••••••••••••">
                     </div>
                     {% if field.errors %}
                         <p class="text-[10px] text-red-500 font-700 uppercase tracking-wider px-1">{{ field.errors.0 }}</p>
@@ -180,5 +192,161 @@
         </div>
     </div>
 </div>
-{% endblock content %}
 
+<!-- Interactive Crop & Adjust Modal -->
+<div id="crop-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-[#0f1422] border border-gray-800 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+        
+        <div class="flex items-center justify-between pb-4 border-b border-gray-800">
+            <div>
+                <h3 class="text-lg font-sora font-800 text-white uppercase tracking-tight">Adjust &amp; Crop Profile Picture</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Drag to reposition, zoom in/out to fit the circular profile frame.</p>
+            </div>
+            <button type="button" id="close-crop-modal" class="p-2 rounded-xl text-gray-500 hover:text-white hover:bg-gray-800 transition-colors">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+        </div>
+
+        <!-- Cropper Image Container -->
+        <div class="relative w-full h-80 bg-black/70 rounded-2xl overflow-hidden flex items-center justify-center border border-gray-800">
+            <img id="cropper-image" src="" alt="Crop preview" class="max-h-full max-w-full block">
+        </div>
+
+        <!-- Adjustment Controls (Zoom, Rotate, Reset) -->
+        <div class="flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-2">
+                <button type="button" id="zoom-in-btn" class="p-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-xs transition-colors flex items-center gap-1.5" title="Zoom In">
+                    <span class="material-symbols-outlined text-sm">zoom_in</span>
+                    <span>Zoom In</span>
+                </button>
+                <button type="button" id="zoom-out-btn" class="p-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-xs transition-colors flex items-center gap-1.5" title="Zoom Out">
+                    <span class="material-symbols-outlined text-sm">zoom_out</span>
+                    <span>Zoom Out</span>
+                </button>
+                <button type="button" id="rotate-btn" class="p-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-xs transition-colors flex items-center gap-1.5" title="Rotate 90deg">
+                    <span class="material-symbols-outlined text-sm">rotate_right</span>
+                    <span>Rotate</span>
+                </button>
+            </div>
+            <button type="button" id="reset-crop-btn" class="text-xs text-gray-400 hover:text-white transition-colors">
+                Reset
+            </button>
+        </div>
+
+        <!-- Modal Action Footer -->
+        <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-800">
+            <button type="button" id="cancel-crop-btn" class="px-5 py-3 rounded-xl text-xs font-800 text-gray-400 hover:text-white uppercase tracking-wider transition-colors">
+                Cancel
+            </button>
+            <button type="button" id="apply-crop-btn" class="px-7 py-3 rounded-xl bg-primary-container hover:scale-[1.02] text-white font-800 text-xs uppercase tracking-wider transition-all shadow-lg shadow-primary-container/20 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">check</span>
+                Apply &amp; Set Photo
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Cropper.js Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script>
+    let cropper = null;
+    let rawImageSource = null;
+    const fileInput = document.getElementById('profile_picture');
+    const cropModal = document.getElementById('crop-modal');
+    const cropperImage = document.getElementById('cropper-image');
+    const previewImg = document.getElementById('image-preview');
+    const placeholder = document.getElementById('placeholder-preview');
+    const fileStatus = document.getElementById('file-status');
+    const reAdjustBtn = document.getElementById('re-adjust-btn');
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            rawImageSource = event.target.result;
+            openCropper(rawImageSource);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    function openCropper(imageSrc) {
+        cropperImage.src = imageSrc;
+        cropModal.classList.remove('hidden');
+
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+
+        cropper = new Cropper(cropperImage, {
+            aspectRatio: 1, // 1:1 square for circular avatar
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 0.9,
+            restore: false,
+            guides: false,
+            center: true,
+            highlight: false,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false,
+        });
+    }
+
+    function closeCropper() {
+        cropModal.classList.add('hidden');
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    }
+
+    document.getElementById('close-crop-modal').addEventListener('click', closeCropper);
+    document.getElementById('cancel-crop-btn').addEventListener('click', closeCropper);
+
+    document.getElementById('zoom-in-btn').addEventListener('click', () => cropper && cropper.zoom(0.1));
+    document.getElementById('zoom-out-btn').addEventListener('click', () => cropper && cropper.zoom(-0.1));
+    document.getElementById('rotate-btn').addEventListener('click', () => cropper && cropper.rotate(90));
+    document.getElementById('reset-crop-btn').addEventListener('click', () => cropper && cropper.reset());
+
+    reAdjustBtn.addEventListener('click', () => {
+        if (rawImageSource) {
+            openCropper(rawImageSource);
+        } else if (previewImg && previewImg.src && previewImg.src !== '#') {
+            openCropper(previewImg.src);
+        }
+    });
+
+    document.getElementById('apply-crop-btn').addEventListener('click', function() {
+        if (!cropper) return;
+
+        // Export cropped result to high-resolution square canvas
+        const canvas = cropper.getCroppedCanvas({
+            width: 400,
+            height: 400,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high',
+        });
+
+        canvas.toBlob(function(blob) {
+            // Replace the file inside fileInput using DataTransfer
+            const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            fileInput.files = dataTransfer.files;
+
+            // Update live preview in page
+            previewImg.src = canvas.toDataURL('image/jpeg');
+            previewImg.style.display = 'block';
+            previewImg.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+            fileStatus.classList.remove('hidden');
+            reAdjustBtn.classList.remove('hidden');
+
+            closeCropper();
+        }, 'image/jpeg', 0.92);
+    });
+</script>
+{% endblock content %}
