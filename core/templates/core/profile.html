@@ -10,7 +10,10 @@
             
             <div class="relative inline-block mb-6">
                 {% if profile.profile_picture %}
-                    <img src="{{ profile.profile_picture.url }}" class="w-32 h-32 rounded-full mx-auto border-4 border-gray-800 shadow-2xl object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ profile.profile_picture.url }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" class="w-32 h-32 rounded-full mx-auto border-4 border-gray-800 shadow-2xl object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div style="display: none;" class="w-32 h-32 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 items-center justify-center text-white text-5xl font-800 mx-auto border-4 border-gray-800 shadow-2xl">
+                        {{ profile.user.username|first|upper }}
+                    </div>
                 {% else %}
                     <div class="w-32 h-32 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-white text-5xl font-800 mx-auto border-4 border-gray-800 shadow-2xl">
                         {{ profile.user.username|first|upper }}
