@@ -1,4 +1,4 @@
-# SkillMesh
+﻿# SkillMesh
 
 > A technical talent discovery platform and experimental distributed systems prototype for studying event-driven workflows, observability, and reliability.
 
@@ -36,12 +36,12 @@ The v2 architecture is intended as an experimental systems prototype and researc
 
 SkillMesh provides a technical networking and talent discovery environment with features including:
 
-- **Technical Profiles** — Users can create profiles showcasing their skills and technical background.
-- **Skill-Based Discovery** — Designed to support talent and technical profile exploration.
-- **Broadcast Signaling** — Centralized updates for hiring, opportunities, and technical activity.
-- **System Insights & Analytics** — Event-oriented platform monitoring and interaction tracking.
-- **Secure Handshakes** — Integrated peer-to-peer communication and collaboration mechanisms.
-- **Responsive User Interface** — Interactive frontend experience designed for modern technical users.
+- **Technical Profiles** â€” Users can create profiles showcasing their skills and technical background.
+- **Skill-Based Discovery** â€” Designed to support talent and technical profile exploration.
+- **Broadcast Signaling** â€” Centralized updates for hiring, opportunities, and technical activity.
+- **System Insights & Analytics** â€” Event-oriented platform monitoring and interaction tracking.
+- **Secure Handshakes** â€” Integrated peer-to-peer communication and collaboration mechanisms.
+- **Responsive User Interface** â€” Interactive frontend experience designed for modern technical users.
 
 ---
 
@@ -102,32 +102,32 @@ The experimental distributed workflow follows the general sequence below:
 
 ```text
 Application Event
-       │
-       ▼
+       â”‚
+       â–¼
 Coordinator Service
-       │
-       │  Inject Trace Context
-       ▼
+       â”‚
+       â”‚  Inject Trace Context
+       â–¼
 Redis Streams Event Bus
-       │
-       ├──────────────► Worker Alpha
-       │                     │
-       │                     ├── Process Event
-       │                     ├── Emit Telemetry
-       │                     └── Send Heartbeat
-       │
-       └──────────────► Worker Beta
-                             │
-                             ├── Process / Store State
-                             ├── Emit Telemetry
-                             └── Send Heartbeat
+       â”‚
+       â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º Worker Alpha
+       â”‚                     â”‚
+       â”‚                     â”œâ”€â”€ Process Event
+       â”‚                     â”œâ”€â”€ Emit Telemetry
+       â”‚                     â””â”€â”€ Send Heartbeat
+       â”‚
+       â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º Worker Beta
+                             â”‚
+                             â”œâ”€â”€ Process / Store State
+                             â”œâ”€â”€ Emit Telemetry
+                             â””â”€â”€ Send Heartbeat
 
 Telemetry
-       │
-       ▼
+       â”‚
+       â–¼
 OpenTelemetry
-       │
-       ▼
+       â”‚
+       â–¼
 Jaeger Trace Visualization
 ```
 
@@ -201,9 +201,9 @@ The architecture is designed to track event flow between:
 
 ```text
 Coordinator
-      ↓
+      â†“
 Redis Streams
-      ↓
+      â†“
 Worker Nodes
 ```
 
@@ -233,15 +233,15 @@ Conceptually:
 
 ```text
 Coordinator
-    │
-    │ TraceID + Context
-    ▼
+    â”‚
+    â”‚ TraceID + Context
+    â–¼
 Redis Event
-    │
-    ▼
+    â”‚
+    â–¼
 Worker
-    │
-    ▼
+    â”‚
+    â–¼
 Child Processing Span
 ```
 
@@ -270,22 +270,22 @@ The mechanism is intended to support experiments involving:
 
 ## Backend and Distributed Services
 
-- **Django** — Core web application framework
-- **FastAPI** — Coordinator and distributed service APIs
-- **Python** — Primary backend and systems programming language
-- **Redis Streams** — Asynchronous event communication
-- **OpenTelemetry** — Distributed tracing and observability
-- **Jaeger** — Trace visualization
-- **Docker** — Service containerization
-- **Docker Compose** — Multi-container orchestration
+- **Django** â€” Core web application framework
+- **FastAPI** â€” Coordinator and distributed service APIs
+- **Python** â€” Primary backend and systems programming language
+- **Redis Streams** â€” Asynchronous event communication
+- **OpenTelemetry** â€” Distributed tracing and observability
+- **Jaeger** â€” Trace visualization
+- **Docker** â€” Service containerization
+- **Docker Compose** â€” Multi-container orchestration
 
 ---
 
 ## Application and Data Layer
 
-- **Django** — Core application logic
-- **Supabase** — Application data and backend services
-- **Authentication Components** — User identity and access management
+- **Django** â€” Core application logic
+- **Supabase** â€” Application data and backend services
+- **Authentication Components** â€” User identity and access management
 
 ---
 
@@ -304,29 +304,29 @@ The frontend provides the user-facing SkillMesh platform interface.
 
 ```text
 SkillMesh/
-│
-├── docker-compose.yml
-│
-├── core/
-│   ├── views.py
-│   ├── urls.py
-│   └── ...
-│
-├── services/
-│   │
-│   ├── coordinator/
-│   │   ├── main.py
-│   │   ├── Dockerfile
-│   │   └── requirements.txt
-│   │
-│   └── worker_node/
-│       ├── main.py
-│       ├── Dockerfile
-│       └── requirements.txt
-│
-├── requirements.txt
-├── README.md
-└── ...
+â”‚
+â”œâ”€â”€ docker-compose.yml
+â”‚
+â”œâ”€â”€ core/
+â”‚   â”œâ”€â”€ views.py
+â”‚   â”œâ”€â”€ urls.py
+â”‚   â””â”€â”€ ...
+â”‚
+â”œâ”€â”€ services/
+â”‚   â”‚
+â”‚   â”œâ”€â”€ coordinator/
+â”‚   â”‚   â”œâ”€â”€ main.py
+â”‚   â”‚   â”œâ”€â”€ Dockerfile
+â”‚   â”‚   â””â”€â”€ requirements.txt
+â”‚   â”‚
+â”‚   â””â”€â”€ worker_node/
+â”‚       â”œâ”€â”€ main.py
+â”‚       â”œâ”€â”€ Dockerfile
+â”‚       â””â”€â”€ requirements.txt
+â”‚
+â”œâ”€â”€ requirements.txt
+â”œâ”€â”€ README.md
+â””â”€â”€ ...
 ```
 
 > The exact repository structure may evolve as additional services and experiments are added.
