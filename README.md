@@ -67,31 +67,66 @@ The system is designed to experiment with end-to-end event tracking across indep
 
 ```mermaid
 flowchart TD
+    Developer(["Developer / Systems Architect"]):::actor -->|Define Workflow & Policies| WF_DEF
 
-    Client["SkillMesh Web Application"] --> API["Application & API Layer"]
+    subgraph WF_DEF ["1. Workflow Definition Layer"]
+        Designer["Workflow Designer<br/>• Visual Canvas • Code DSL"]
+        Builder["DAG Builder<br/>• Dependency Graph"]
+        Validator["Policy Validator<br/>• Schema & Cost Guard"]
+        Designer --> Builder --> Validator
+    end
 
-    API --> Coordinator["Coordinator Service"]
+    Validator -->|Deploy DAG| Scheduler
 
-    Coordinator -->|"Publish Event + Trace Context"| Redis["Redis Streams"]
+    subgraph ENGINE ["2. Orchestration & Coordination Engine (Coordinator)"]
+        Scheduler["Scheduler<br/>• Cron • Event Trigger • Backpressure"]
+        Queue["Task Stream Queue<br/>• Redis Streams PEL"]
+        Executor["Executor Pool & Router<br/>• W3C Context Injection"]
+        
+        subgraph STRATEGIES ["Execution Strategies"]
+            Seq["Sequential"]
+            Par["Parallel"]
+            Cond["Conditional"]
+            Loop["Iterative Loop"]
+        end
 
-    Redis -->|"Consume Event"| WorkerA["Worker Alpha"]
-    Redis -->|"Consume Event"| WorkerB["Worker Beta"]
+        Scheduler -->|Queue Tasks| Queue
+        Queue -->|Distribute| Executor
+        Executor -.-> STRATEGIES
+    end
 
-    WorkerA -->|"Processing Events"| Redis
-    WorkerB -->|"State / Processing Events"| Redis
+    Executor -->|Task Dispatch + traceparent| WP
+    Executor -->|Read / Write State| STATE
+    Executor -->|Emit Spans / Metrics| MON
+    MON -->|Interactive Waterfall Spans| JAEGER["Jaeger Trace UI"]
 
-    WorkerA -->|"Telemetry"| OTel["OpenTelemetry"]
-    WorkerB -->|"Telemetry"| OTel
-    Coordinator -->|"Telemetry"| OTel
+    subgraph WP ["3. Distributed Worker Pool"]
+        W_Agent["Worker-Alpha<br/>(Inference Simulator)"]
+        W_Store["Worker-Beta<br/>(State Store & Sync)"]
+        W_Tool["Tool Workers<br/>(I/O & Batch Analytics)"]
+    end
 
-    OTel --> Jaeger["Jaeger Trace Visualization"]
+    subgraph STATE ["4. State & Monitoring Mesh"]
+        StateStore[("Supabase / Redis<br/>Checkpoint Store")]
+        EventBus["skillmesh:events<br/>Consumer Group Bus"]
+        MON["OpenTelemetry Collector<br/>(OTLP Port 4318)"]
+    end
 
-    WorkerA -->|"Heartbeat"| Heartbeats["Heartbeat Stream"]
-    WorkerB -->|"Heartbeat"| Heartbeats
+    WP -->|Store Artifacts / Checkpoints| EXT_RES[("Results Store")]
+    WP -->|Heartbeat Ping: 2.0s| Scheduler
+    Executor -->|Telemetry Stream| User(["User / Dashboard"]):::actor
 
-    Heartbeats --> Coordinator
+    subgraph EXT ["5. External Systems & Data"]
+        DataSources[("Data Sources & APIs")]
+        NotifService["Notification Relay"]
+        EXT_RES
+    end
 
-    Coordinator -->|"Health Status"| Monitoring["Cluster Monitoring"]
+    WP -.->|Fetch Data| DataSources
+    STATE -->|Alert Triggers| NotifService
+
+    classDef actor fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#fff;
+    classDef default fill:#0b0f19,stroke:#374151,stroke-width:1.5px,color:#e2e8f0;
 ```
 
 ---

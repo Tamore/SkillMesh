@@ -182,117 +182,199 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- V2 DISTRIBUTED PIPELINE FLOWCHART DIAGRAM -->
+﻿        <!-- ========================================== -->
+        <!-- ENTERPRISE AI WORKFLOW ORCHESTRATION PIPELINE -->
         <!-- ========================================== -->
         <div class="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl relative overflow-hidden shadow-2xl">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-white/10 mb-6">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-white/10 mb-8">
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-purple-400 text-lg">schema</span>
-                        <h3 class="text-lg font-bold text-white uppercase tracking-wider">End-to-End Distributed Pipeline Flow</h3>
+                        <span class="material-symbols-outlined text-purple-400 text-xl">account_tree</span>
+                        <h3 class="text-xl font-bold text-white tracking-tight uppercase">AI Workflow Orchestration Engine</h3>
                     </div>
-                    <p class="text-xs text-gray-400 font-mono mt-0.5">Asynchronous task dispatch, stream queue buffering, worker execution &amp; OTel trace telemetry</p>
+                    <p class="text-xs text-gray-400 font-mono mt-1">Enterprise-Scale Directed Acyclic Graph (DAG) Pipeline &amp; Distributed Worker Coordination</p>
                 </div>
-                <div class="flex items-center gap-2 font-mono text-[11px] text-gray-400 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10">
-                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                    <span>W3C TraceContext Pipeline</span>
+                <div class="flex items-center gap-2 font-mono text-xs text-purple-300 bg-purple-950/40 border border-purple-500/30 px-3.5 py-1.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                    <span>Multi-Node Mesh Online</span>
                 </div>
             </div>
 
-            <!-- Responsive Flow Pipeline Container -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 relative items-stretch">
+            <!-- Architectural Top-to-Bottom Orchestration Topology -->
+            <div class="space-y-6">
                 
-                <!-- Step 1: Coordinator Node -->
-                <div id="pipe-step-1" class="p-5 rounded-2xl bg-black/50 border border-purple-500/30 flex flex-col justify-between relative transition-all duration-300 group hover:border-purple-400">
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-widest px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20">
-                                Step 1 · Dispatch
+                <!-- Layer 1: Developer & Workflow Definition -->
+                <div class="p-6 rounded-2xl bg-black/40 border border-blue-500/20 relative">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-mono font-bold text-blue-400 uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/30">
+                                Layer 1 · Workflow Definition
                             </span>
-                            <span class="material-symbols-outlined text-purple-400 text-sm">hub</span>
                         </div>
-                        <h4 class="text-sm font-bold text-white font-mono mt-1">Coordinator Node</h4>
-                        <p class="text-[11px] text-gray-400 font-mono leading-relaxed">
-                            FastAPI orchestrator creates root span, injects <span class="text-purple-300">traceparent</span> header, and pushes task to broker.
-                        </p>
+                        <span class="text-[11px] font-mono text-gray-500">Developer DSL / Visual DAG</span>
                     </div>
-                    <div class="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
-                        <span>Action: XADD</span>
-                        <span class="text-green-400 font-bold">READY</span>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
+                        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-center space-y-1">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">design_services</span>
+                            <div class="font-bold text-white text-xs">Workflow Designer</div>
+                            <div class="text-[10px] text-gray-400">Visual Canvas &amp; DSL</div>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-center space-y-1">
+                            <span class="material-symbols-outlined text-indigo-400 text-lg">insights</span>
+                            <div class="font-bold text-white text-xs">DAG Builder</div>
+                            <div class="text-[10px] text-gray-400">Dependency Graph Resolution</div>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-center space-y-1">
+                            <span class="material-symbols-outlined text-teal-400 text-lg">verified_user</span>
+                            <div class="font-bold text-white text-xs">Policy Validator</div>
+                            <div class="text-[10px] text-gray-400">Schema &amp; Rate Budget Check</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Step 2: Redis Stream Broker -->
-                <div id="pipe-step-2" class="p-5 rounded-2xl bg-black/50 border border-indigo-500/30 flex flex-col justify-between relative transition-all duration-300 group hover:border-indigo-400">
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-widest px-2 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20">
-                                Step 2 · Buffer
-                            </span>
-                            <span class="material-symbols-outlined text-indigo-400 text-sm">layers</span>
-                        </div>
-                        <h4 class="text-sm font-bold text-white font-mono mt-1">Redis Stream Broker</h4>
-                        <p class="text-[11px] text-gray-400 font-mono leading-relaxed">
-                            <span class="text-indigo-300">skillmesh:events</span> buffers incoming tasks into persistent consumer groups with PEL tracking.
-                        </p>
-                    </div>
-                    <div class="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
-                        <span>Consumer Group</span>
-                        <span class="text-indigo-400 font-bold">STREAM OK</span>
+                <!-- Central Connector Arrow -->
+                <div class="flex justify-center -my-2">
+                    <div class="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300">
+                        <span class="material-symbols-outlined text-base">arrow_downward</span>
                     </div>
                 </div>
 
-                <!-- Step 3: Worker Nodes (Alpha & Beta) -->
-                <div id="pipe-step-3" class="p-5 rounded-2xl bg-black/50 border border-pink-500/30 flex flex-col justify-between relative transition-all duration-300 group hover:border-pink-400">
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-mono font-bold text-pink-400 uppercase tracking-widest px-2 py-0.5 rounded-md bg-pink-500/10 border border-pink-500/20">
-                                Step 3 · Execute
+                <!-- Layer 2: Orchestration Engine (Coordinator + Scheduler + Queue) -->
+                <div class="p-6 rounded-2xl bg-black/40 border border-purple-500/30 relative">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30">
+                                Layer 2 · Orchestration &amp; Execution Engine
                             </span>
-                            <span class="material-symbols-outlined text-pink-400 text-sm">memory</span>
                         </div>
-                        <h4 class="text-sm font-bold text-white font-mono mt-1">Worker Node Pool</h4>
-                        <p class="text-[11px] text-gray-400 font-mono leading-relaxed">
-                            <span class="text-pink-300">Worker-Alpha</span> &amp; <span class="text-pink-300">Beta</span> extract context, process payload, record hop latency &amp; ACK.
-                        </p>
+                        <span class="text-[11px] font-mono text-purple-300">FastAPI Coordinator + Redis Stream Bus</span>
                     </div>
-                    <div class="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
-                        <span>Action: XACK</span>
-                        <span class="text-green-400 font-bold">2 ACTIVE</span>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+                        <div id="pipe-step-1" class="p-4 rounded-xl bg-purple-950/30 border border-purple-500/40 space-y-2">
+                            <div class="flex items-center justify-between text-[11px] font-bold text-purple-300">
+                                <span>Scheduler</span>
+                                <span class="material-symbols-outlined text-sm">schedule</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 leading-relaxed">
+                                Handles cron triggers, backpressure controls, and queue ingestion.
+                            </p>
+                            <div class="text-[10px] text-gray-500 pt-2 border-t border-white/5">Trigger: Event / Cron</div>
+                        </div>
+
+                        <div id="pipe-step-2" class="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/40 space-y-2">
+                            <div class="flex items-center justify-between text-[11px] font-bold text-indigo-300">
+                                <span>Task Stream Queue</span>
+                                <span class="material-symbols-outlined text-sm">queue</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 leading-relaxed">
+                                Redis Streams <span class="text-indigo-200">skillmesh:events</span> with Consumer Group PEL tracking.
+                            </p>
+                            <div class="text-[10px] text-gray-500 pt-2 border-t border-white/5">Storage: Stream Buffer</div>
+                        </div>
+
+                        <div id="pipe-step-3" class="p-4 rounded-xl bg-pink-950/30 border border-pink-500/40 space-y-2">
+                            <div class="flex items-center justify-between text-[11px] font-bold text-pink-300">
+                                <span>Executor Pool &amp; Router</span>
+                                <span class="material-symbols-outlined text-sm">alt_route</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 leading-relaxed">
+                                W3C TraceContext injection, failure recovery, and strategy routing.
+                            </p>
+                            <div class="text-[10px] text-gray-500 pt-2 border-t border-white/5">Strategies: Seq / Par / Cond / Loop</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Step 4: Observability & Tracing -->
-                <div id="pipe-step-4" class="p-5 rounded-2xl bg-black/50 border border-yellow-500/30 flex flex-col justify-between relative transition-all duration-300 group hover:border-yellow-400">
-                    <div class="space-y-2">
+                <!-- Central Connector Split -->
+                <div class="flex justify-around items-center -my-2 px-12">
+                    <div class="w-8 h-8 rounded-full bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-300">
+                        <span class="material-symbols-outlined text-base">arrow_downward</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center text-yellow-300">
+                        <span class="material-symbols-outlined text-base">arrow_downward</span>
+                    </div>
+                </div>
+
+                <!-- Layer 3: Worker Nodes Pool & Observability -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Worker Subsystem -->
+                    <div class="p-6 rounded-2xl bg-black/40 border border-pink-500/30 space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-mono font-bold text-yellow-400 uppercase tracking-widest px-2 py-0.5 rounded-md bg-yellow-500/10 border border-yellow-500/20">
-                                Step 4 · Observe
+                            <span class="text-[10px] font-mono font-bold text-pink-400 uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/30">
+                                Layer 3A · Distributed Worker Pool
                             </span>
-                            <span class="material-symbols-outlined text-yellow-400 text-sm">waterfall_chart</span>
+                            <span class="text-[10px] font-mono text-green-400 font-bold">2 NODES READY</span>
                         </div>
-                        <h4 class="text-sm font-bold text-white font-mono mt-1">Jaeger Trace Collector</h4>
-                        <p class="text-[11px] text-gray-400 font-mono leading-relaxed">
-                            Collects spans via <span class="text-yellow-300">OTLP (Port 4318)</span> to reconstruct full waterfall timeline &amp; per-hop latency.
-                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                            <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+                                <div class="flex justify-between items-center text-white font-bold">
+                                    <span>Worker-Alpha</span>
+                                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                                </div>
+                                <div class="text-[11px] text-purple-300">Inference Simulator</div>
+                                <p class="text-[10px] text-gray-400">Processes model-oriented execution payloads.</p>
+                            </div>
+
+                            <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+                                <div class="flex justify-between items-center text-white font-bold">
+                                    <span>Worker-Beta</span>
+                                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                                </div>
+                                <div class="text-[11px] text-indigo-300">State-Store &amp; Sync</div>
+                                <p class="text-[10px] text-gray-400">Handles state persistence &amp; checkpoint sync.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
-                        <span>Port 16686 / 4318</span>
-                        <span class="text-yellow-400 font-bold">TRACING</span>
+
+                    <!-- Observability & Monitoring Subsystem -->
+                    <div id="pipe-step-4" class="p-6 rounded-2xl bg-black/40 border border-yellow-500/30 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-mono font-bold text-yellow-400 uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30">
+                                Layer 3B · Observability &amp; State Monitoring
+                            </span>
+                            <span class="text-[10px] font-mono text-yellow-400">Port 4318 (OTLP)</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                            <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+                                <div class="flex justify-between items-center text-white font-bold">
+                                    <span>OpenTelemetry</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-sm">timeline</span>
+                                </div>
+                                <div class="text-[11px] text-yellow-300">W3C Span Propagation</div>
+                                <p class="text-[10px] text-gray-400">Calculates per-hop dispatch and transit latencies.</p>
+                            </div>
+
+                            <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+                                <div class="flex justify-between items-center text-white font-bold">
+                                    <span>Jaeger Tracing UI</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-sm">waterfall_chart</span>
+                                </div>
+                                <div class="text-[11px] text-yellow-300">Waterfall Telemetry</div>
+                                <p class="text-[10px] text-gray-400">Interactive trace waterfall inspection.</p>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
 
             </div>
 
-            <!-- Real-Time Animated Pulse Line -->
+            <!-- Signal Transit Banner -->
             <div class="mt-6 p-4 rounded-2xl bg-black/60 border border-white/5 flex items-center justify-between flex-wrap gap-4 font-mono text-xs">
                 <div class="flex items-center gap-3">
-                    <span class="text-gray-500 uppercase text-[10px] font-bold tracking-widest">Active Signal Transit:</span>
+                    <span class="text-gray-500 uppercase text-[10px] font-bold tracking-widest">Active DAG Transit:</span>
                     <div class="flex items-center gap-1.5 text-purple-300 font-bold">
-                        <span>Coordinator</span>
+                        <span>Workflow DSL</span>
                         <span class="text-gray-600">→</span>
-                        <span class="text-indigo-300">Redis Stream</span>
+                        <span class="text-blue-300">Scheduler</span>
+                        <span class="text-gray-600">→</span>
+                        <span class="text-indigo-300">Redis Streams</span>
                         <span class="text-gray-600">→</span>
                         <span class="text-pink-300">Worker Node</span>
                         <span class="text-gray-600">→</span>
@@ -300,7 +382,7 @@
                     </div>
                 </div>
                 <div id="packet-status" class="text-gray-400 text-[11px]">
-                    Status: <span class="text-green-400 font-semibold">Idle / Ready for Dispatch</span>
+                    Status: <span class="text-green-400 font-semibold">Ready · Click "Dispatch Trace Task" to simulate</span>
                 </div>
             </div>
         </div>
