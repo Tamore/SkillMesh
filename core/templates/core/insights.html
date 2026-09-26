@@ -182,6 +182,129 @@
             </div>
         </div>
 
+        <!-- ========================================== -->
+        <!-- V2 DISTRIBUTED PIPELINE FLOWCHART DIAGRAM -->
+        <!-- ========================================== -->
+        <div class="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl relative overflow-hidden shadow-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-6 border-b border-white/10 mb-6">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-purple-400 text-lg">schema</span>
+                        <h3 class="text-lg font-bold text-white uppercase tracking-wider">End-to-End Distributed Pipeline Flow</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 font-mono mt-0.5">Asynchronous task dispatch, stream queue buffering, worker execution &amp; OTel trace telemetry</p>
+                </div>
+                <div class="flex items-center gap-2 font-mono text-[11px] text-gray-400 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10">
+                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                    <span>W3C TraceContext Pipeline</span>
+                </div>
+            </div>
+
+            <!-- Responsive Flow Pipeline Container -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 relative items-stretch">
+                
+                <!-- Step 1: Coordinator Node -->
+                <div id="pipe-step-1" class="p-5 rounded-2xl bg-black/50 border border-purple-500/30 flex flex-col justify-between relative transition-all duration-300 group hover:border-purple-400">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-widest px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20">
+                                Step 1 · Dispatch
+                            </span>
+                            <span class="material-symbols-outlined text-purple-400 text-sm">hub</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white font-mono mt-1">Coordinator Node</h4>
+                        <p class="text-[11px] text-gray-400 font-mono leading-relaxed">
+                            FastAPI orchestrator creates root span, injects <span class="text-purple-300">traceparent</span> header, and pushes task to broker.
+                        </p>
+                    </div>
+                    <div class="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
+                        <span>Action: XADD</span>
+                        <span class="text-green-400 font-bold">READY</span>
+                    </div>
+                </div>
+
+                <!-- Step 2: Redis Stream Broker -->
+                <div id="pipe-step-2" class="p-5 rounded-2xl bg-black/50 border border-indigo-500/30 flex flex-col justify-between relative transition-all duration-300 group hover:border-indigo-400">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-widest px-2 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20">
+                                Step 2 · Buffer
+                            </span>
+                            <span class="material-symbols-outlined text-indigo-400 text-sm">layers</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white font-mono mt-1">Redis Stream Broker</h4>
+                        <p class="text-[11px] text-gray-400 font-mono leading-relaxed">
+                            <span class="text-indigo-300">skillmesh:events</span> buffers incoming tasks into persistent consumer groups with PEL tracking.
+                        </p>
+                    </div>
+                    <div class="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
+                        <span>Consumer Group</span>
+                        <span class="text-indigo-400 font-bold">STREAM OK</span>
+                    </div>
+                </div>
+
+                <!-- Step 3: Worker Nodes (Alpha & Beta) -->
+                <div id="pipe-step-3" class="p-5 rounded-2xl bg-black/50 border border-pink-500/30 flex flex-col justify-between relative transition-all duration-300 group hover:border-pink-400">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-mono font-bold text-pink-400 uppercase tracking-widest px-2 py-0.5 rounded-md bg-pink-500/10 border border-pink-500/20">
+                                Step 3 · Execute
+                            </span>
+                            <span class="material-symbols-outlined text-pink-400 text-sm">memory</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white font-mono mt-1">Worker Node Pool</h4>
+                        <p class="text-[11px] text-gray-400 font-mono leading-relaxed">
+                            <span class="text-pink-300">Worker-Alpha</span> &amp; <span class="text-pink-300">Beta</span> extract context, process payload, record hop latency &amp; ACK.
+                        </p>
+                    </div>
+                    <div class="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
+                        <span>Action: XACK</span>
+                        <span class="text-green-400 font-bold">2 ACTIVE</span>
+                    </div>
+                </div>
+
+                <!-- Step 4: Observability & Tracing -->
+                <div id="pipe-step-4" class="p-5 rounded-2xl bg-black/50 border border-yellow-500/30 flex flex-col justify-between relative transition-all duration-300 group hover:border-yellow-400">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-mono font-bold text-yellow-400 uppercase tracking-widest px-2 py-0.5 rounded-md bg-yellow-500/10 border border-yellow-500/20">
+                                Step 4 · Observe
+                            </span>
+                            <span class="material-symbols-outlined text-yellow-400 text-sm">waterfall_chart</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white font-mono mt-1">Jaeger Trace Collector</h4>
+                        <p class="text-[11px] text-gray-400 font-mono leading-relaxed">
+                            Collects spans via <span class="text-yellow-300">OTLP (Port 4318)</span> to reconstruct full waterfall timeline &amp; per-hop latency.
+                        </p>
+                    </div>
+                    <div class="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
+                        <span>Port 16686 / 4318</span>
+                        <span class="text-yellow-400 font-bold">TRACING</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Real-Time Animated Pulse Line -->
+            <div class="mt-6 p-4 rounded-2xl bg-black/60 border border-white/5 flex items-center justify-between flex-wrap gap-4 font-mono text-xs">
+                <div class="flex items-center gap-3">
+                    <span class="text-gray-500 uppercase text-[10px] font-bold tracking-widest">Active Signal Transit:</span>
+                    <div class="flex items-center gap-1.5 text-purple-300 font-bold">
+                        <span>Coordinator</span>
+                        <span class="text-gray-600">→</span>
+                        <span class="text-indigo-300">Redis Stream</span>
+                        <span class="text-gray-600">→</span>
+                        <span class="text-pink-300">Worker Node</span>
+                        <span class="text-gray-600">→</span>
+                        <span class="text-yellow-300">Jaeger Trace</span>
+                    </div>
+                </div>
+                <div id="packet-status" class="text-gray-400 text-[11px]">
+                    Status: <span class="text-green-400 font-semibold">Idle / Ready for Dispatch</span>
+                </div>
+            </div>
+        </div>
+
         <!-- V2 Cluster Metrics Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
@@ -394,16 +517,46 @@
         }
     }
 
-    // Interactive Dispatch Task
+    // Interactive Dispatch Task with Pipeline Step Animation
     async function dispatchV2Task() {
         const btn = document.getElementById('dispatchBtn');
         const consoleEl = document.getElementById('v2Console');
+        const packetStatus = document.getElementById('packet-status');
         btn.disabled = true;
         btn.innerHTML = `<span class="material-symbols-outlined text-base animate-spin">refresh</span> Dispatching...`;
+
+        const s1 = document.getElementById('pipe-step-1');
+        const s2 = document.getElementById('pipe-step-2');
+        const s3 = document.getElementById('pipe-step-3');
+        const s4 = document.getElementById('pipe-step-4');
+
+        // Step 1: Coordinator
+        if (s1) s1.classList.add('border-purple-400', 'ring-2', 'ring-purple-500/50', 'scale-[1.02]');
+        if (packetStatus) packetStatus.innerHTML = `Status: <span class="text-purple-400 font-bold">Step 1: Coordinator injecting W3C TraceContext into payload...</span>`;
+        await new Promise(r => setTimeout(r, 250));
+
+        // Step 2: Redis Stream
+        if (s1) s1.classList.remove('border-purple-400', 'ring-2', 'ring-purple-500/50', 'scale-[1.02]');
+        if (s2) s2.classList.add('border-indigo-400', 'ring-2', 'ring-indigo-500/50', 'scale-[1.02]');
+        if (packetStatus) packetStatus.innerHTML = `Status: <span class="text-indigo-400 font-bold">Step 2: Buffered in Redis Stream (skillmesh:events PEL)...</span>`;
+        await new Promise(r => setTimeout(r, 300));
 
         try {
             const res = await fetch('/api/v2/dispatch/', { method: 'POST' });
             const data = await res.json();
+
+            // Step 3: Worker Node Pool
+            if (s2) s2.classList.remove('border-indigo-400', 'ring-2', 'ring-indigo-500/50', 'scale-[1.02]');
+            if (s3) s3.classList.add('border-pink-400', 'ring-2', 'ring-pink-500/50', 'scale-[1.02]');
+            if (packetStatus) packetStatus.innerHTML = `Status: <span class="text-pink-400 font-bold">Step 3: Worker-Alpha executing span & extracting traceparent...</span>`;
+            await new Promise(r => setTimeout(r, 300));
+
+            // Step 4: Jaeger Trace Collector
+            if (s3) s3.classList.remove('border-pink-400', 'ring-2', 'ring-pink-500/50', 'scale-[1.02]');
+            if (s4) s4.classList.add('border-yellow-400', 'ring-2', 'ring-yellow-500/50', 'scale-[1.02]');
+            if (packetStatus) packetStatus.innerHTML = `Status: <span class="text-yellow-400 font-bold">Step 4: OTLP trace exported to Jaeger (Latency: ${data.latency_ms || 1.42}ms)</span>`;
+            await new Promise(r => setTimeout(r, 400));
+            if (s4) s4.classList.remove('border-yellow-400', 'ring-2', 'ring-yellow-500/50', 'scale-[1.02]');
 
             const entry = document.createElement('div');
             entry.className = "p-3 rounded-xl bg-purple-950/40 border border-purple-500/20 text-gray-300 flex flex-col sm:flex-row justify-between gap-2 animate-fade";
@@ -413,7 +566,7 @@
                     <span class="text-white ml-2">Task ${data.task_id.substring(0, 8)}...</span>
                     <span class="text-gray-500 ml-2">TraceID: ${data.trace_id.substring(0, 16)}...</span>
                 </div>
-                <div class="text-purple-300 text-[11px]">Hop Latency: ${data.latency_ms || 1.25}ms</div>
+                <div class="text-purple-300 text-[11px]">Pipeline Latency: ${data.latency_ms || 1.42}ms</div>
             `;
             consoleEl.prepend(entry);
         } catch (e) {
@@ -421,6 +574,9 @@
         } finally {
             btn.disabled = false;
             btn.innerHTML = `<span class="material-symbols-outlined text-base">send</span><span>Dispatch Trace Task</span>`;
+            setTimeout(() => {
+                if (packetStatus) packetStatus.innerHTML = `Status: <span class="text-green-400 font-semibold">Idle / Ready for Dispatch</span>`;
+            }, 1200);
         }
     }
 
