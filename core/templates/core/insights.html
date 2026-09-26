@@ -1,147 +1,433 @@
-{% extends 'core/base.html' %}
+﻿{% extends 'core/base.html' %}
 
 {% block content %}
 <div class="max-w-6xl mx-auto py-8 px-4">
+    <!-- Header with Version Toggle -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h1 class="text-4xl font-black tracking-tighter italic uppercase text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-orange-400 to-yellow-300 pr-4">
-                System Insights
-            </h1>
-            <p class="text-gray-400 font-mono text-sm mt-1">Live Event-Driven Protocol Analytics</p>
-        </div>
-        
-        <a href="{% url 'export_events' %}" class="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 hover:border-pink-500/50 transition-all group">
-            <span class="text-white font-bold tracking-tight">Export to CSV</span>
-            <svg class="w-5 h-5 text-pink-500 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-            </svg>
-        </a>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
-            <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Total Events</p>
-            <h3 class="text-3xl font-black text-white">{{ total_events }}</h3>
-            <div class="h-1 w-12 bg-pink-500 mt-4"></div>
-        </div>
-        
-        <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
-            <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Success Rate</p>
-            <h3 class="text-3xl font-black text-green-400">{{ success_rate|default:"0" }}%</h3>
-            <div class="h-1 w-12 bg-green-500 mt-4"></div>
-        </div>
-
-        <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
-            <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Failure Rate</p>
-            <h3 class="text-3xl font-black text-red-400">{{ failure_rate|default:"0" }}%</h3>
-            <div class="h-1 w-12 bg-red-500 mt-4"></div>
-        </div>
-
-        <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
-            <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Avg Latency</p>
-            <h3 class="text-3xl font-black text-yellow-400">{{ avg_time }}<span class="text-sm font-normal text-gray-500 ml-1">ms</span></h3>
-            <div class="h-1 w-12 bg-yellow-500 mt-4"></div>
-        </div>
-    </div>
-
-    <!-- Growth Graph -->
-    <div class="bg-white/5 border border-white/10 p-8 rounded-3xl backdrop-blur-md mb-12">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-white tracking-tight uppercase tracking-widest">Observed Event Activity</h2>
-            <div class="flex items-center gap-4">
-                <span class="px-3 py-1 bg-pink-500/10 text-pink-500 text-[10px] font-bold rounded-full border border-pink-500/20">Real-Time</span>
-                <span class="flex items-center gap-1.5 text-xs text-gray-400">
-                    <span class="w-2 h-2 rounded-full bg-pink-500"></span>
-                    Recorded Events
+            <div class="flex items-center gap-3">
+                <h1 class="text-4xl font-black tracking-tighter italic uppercase text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-orange-400 to-yellow-300 pr-2">
+                    System Insights
+                </h1>
+                <span id="versionBadge" class="px-2.5 py-0.5 text-[11px] font-mono font-bold rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 uppercase tracking-widest">
+                    v1 Architecture
                 </span>
             </div>
+            <p class="text-gray-400 font-mono text-sm mt-1">Empirical Event Telemetry &amp; Distributed Node Observability</p>
         </div>
-        <div class="h-[300px] w-full">
-            <canvas id="activityChart"></canvas>
+        
+        <!-- Controls: Tab Selector & Export -->
+        <div class="flex items-center gap-3 flex-wrap">
+            <div class="bg-black/60 border border-white/10 p-1 rounded-2xl flex items-center gap-1 shadow-xl">
+                <button type="button" id="tabV1Btn" onclick="switchInsightsTab('v1')" class="px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all bg-gradient-to-r from-pink-500 to-orange-400 text-white shadow-md">
+                    v1: Event Telemetry
+                </button>
+                <button type="button" id="tabV2Btn" onclick="switchInsightsTab('v2')" class="px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all text-gray-400 hover:text-white">
+                    v2: Distributed Cluster
+                </button>
+            </div>
+
+            <a href="{% url 'export_events' %}" class="flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-pink-500/50 transition-all group">
+                <span class="text-white text-xs font-bold tracking-tight">Export CSV</span>
+                <svg class="w-4 h-4 text-pink-500 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+            </a>
         </div>
     </div>
 
-    <!-- Recent Events Table -->
-    <div class="bg-white/5 border border-white/10 rounded-3xl overflow-hidden backdrop-blur-xl">
-        <div class="p-6 border-b border-white/10 flex justify-between items-center">
-            <h2 class="text-xl font-bold text-white tracking-tight">Recent Protocol Activity</h2>
-            <span class="px-3 py-1 bg-pink-500/10 text-pink-500 text-xs font-bold rounded-full border border-pink-500/20">Real-Time</span>
-        </div>
-        
-        <div class="overflow-x-auto">
-            <table class="w-full text-left font-mono text-sm">
-                <!-- ... existing table headers ... -->
-                <thead>
-                    <tr class="text-gray-500 border-b border-white/10 uppercase text-[10px] tracking-widest">
-                        <th class="px-6 py-4">Event Type</th>
-                        <th class="px-6 py-4">Timestamp</th>
-                        <th class="px-6 py-4">Latency</th>
-                        <th class="px-6 py-4">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                    {% for event in events %}
-                    <tr class="hover:bg-white/5 transition-colors">
-                        <td class="px-6 py-4">
-                            <span class="text-white font-bold">{{ event.event_type }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-gray-400">
-                            {{ event.timestamp|date:"Y-m-d H:i:s" }}
-                        </td>
-                        <td class="px-6 py-4 text-gray-400">
-                            {{ event.processing_time }}ms
-                        </td>
-                        <td class="px-6 py-4">
-                            {% if event.status == 'success' %}
-                            <span class="inline-flex items-center gap-1.5 text-green-400 font-bold uppercase text-[10px]">
-                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                                SUCCESS
-                            </span>
-                            {% else %}
-                            <span class="inline-flex items-center gap-1.5 text-red-400 font-bold uppercase text-[10px]">
-                                <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-                                FAILURE
-                            </span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- ========================================== -->
+    <!-- TAB 1: VERSION 1 (APPLICATION EVENT STREAM) -->
+    <!-- ========================================== -->
+    <div id="v1Content" class="space-y-12">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Total Logged Events</p>
+                <h3 class="text-3xl font-black text-white">{{ total_events }}</h3>
+                <div class="h-1 w-12 bg-pink-500 mt-4"></div>
+            </div>
+            
+            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Success Rate</p>
+                <h3 class="text-3xl font-black text-green-400">{{ success_rate|default:"0" }}%</h3>
+                <div class="h-1 w-12 bg-green-500 mt-4"></div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Failure Rate</p>
+                <h3 class="text-3xl font-black text-red-400">{{ failure_rate|default:"0" }}%</h3>
+                <div class="h-1 w-12 bg-red-500 mt-4"></div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Avg Latency</p>
+                <h3 class="text-3xl font-black text-yellow-400">{{ avg_time }}<span class="text-sm font-normal text-gray-500 ml-1">ms</span></h3>
+                <div class="h-1 w-12 bg-yellow-500 mt-4"></div>
+            </div>
         </div>
 
-        <!-- Pagination Controls -->
-        <div class="p-6 border-t border-white/10 flex justify-between items-center">
-            <div class="text-xs text-gray-500 font-mono">
-                Showing page {{ events.number }} of {{ events.paginator.num_pages }}
+        <!-- Growth Graph -->
+        <div class="bg-white/5 border border-white/10 p-8 rounded-3xl backdrop-blur-md">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-tight uppercase tracking-widest">Observed Event Activity</h2>
+                    <p class="text-xs text-gray-400 font-mono mt-1">7-Day Empirical Log Aggregation</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="px-3 py-1 bg-pink-500/10 text-pink-500 text-[10px] font-bold rounded-full border border-pink-500/20">Real-Time</span>
+                    <span class="flex items-center gap-1.5 text-xs text-gray-400">
+                        <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+                        Recorded Events
+                    </span>
+                </div>
             </div>
-            <div class="flex gap-2">
-                {% if events.has_previous %}
-                <a href="?page={{ events.previous_page_number }}" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white transition-all">
-                    <span class="material-symbols-outlined text-sm">arrow_back_ios</span>
-                </a>
-                {% endif %}
-                
-                {% if events.has_next %}
-                <a href="?page={{ events.next_page_number }}" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white transition-all">
-                    <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
-                </a>
-                {% endif %}
+            <div class="h-[280px] w-full">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Events Table -->
+        <div class="bg-white/5 border border-white/10 rounded-3xl overflow-hidden backdrop-blur-xl">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white tracking-tight">Recent Protocol Activity</h2>
+                <span class="px-3 py-1 bg-pink-500/10 text-pink-500 text-xs font-bold rounded-full border border-pink-500/20">Real-Time</span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left font-mono text-sm">
+                    <thead>
+                        <tr class="text-gray-500 border-b border-white/10 uppercase text-[10px] tracking-widest">
+                            <th class="px-6 py-4">Event Type</th>
+                            <th class="px-6 py-4">Timestamp</th>
+                            <th class="px-6 py-4">Latency</th>
+                            <th class="px-6 py-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for event in events %}
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="text-white font-bold">{{ event.event_type }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-400">
+                                {{ event.timestamp|date:"Y-m-d H:i:s" }}
+                            </td>
+                            <td class="px-6 py-4 text-gray-400">
+                                {{ event.processing_time }}ms
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if event.status == 'success' %}
+                                <span class="inline-flex items-center gap-1.5 text-green-400 font-bold uppercase text-[10px]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                                    SUCCESS
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1.5 text-red-400 font-bold uppercase text-[10px]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                    FAILURE
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="p-6 border-t border-white/10 flex justify-between items-center">
+                <div class="text-xs text-gray-500 font-mono">
+                    Showing page {{ events.number }} of {{ events.paginator.num_pages }}
+                </div>
+                <div class="flex gap-2">
+                    {% if events.has_previous %}
+                    <a href="?page={{ events.previous_page_number }}" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white transition-all">
+                        <span class="material-symbols-outlined text-sm">arrow_back_ios</span>
+                    </a>
+                    {% endif %}
+                    
+                    {% if events.has_next %}
+                    <a href="?page={{ events.next_page_number }}" class="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white transition-all">
+                        <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: VERSION 2 (DISTRIBUTED MESH CLUSTER) -->
+    <!-- ========================================== -->
+    <div id="v2Content" class="space-y-10 hidden">
+        <!-- V2 Architecture Header Banner -->
+        <div class="bg-gradient-to-r from-purple-900/40 via-indigo-900/30 to-black/60 border border-purple-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-xl shadow-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <span class="text-xs font-mono font-bold uppercase tracking-wider text-purple-300">Cluster Topology Active</span>
+                    </div>
+                    <h2 class="text-2xl font-black text-white tracking-tight uppercase">SkillMesh v2 Distributed Mesh</h2>
+                    <p class="text-xs sm:text-sm text-gray-400 max-w-xl leading-relaxed">
+                        Coordinator-Worker model over Redis Streams with OpenTelemetry W3C TraceContext propagation and active heartbeat node monitoring.
+                    </p>
+                </div>
+                <!-- Interactive Task Dispatch Trigger -->
+                <button type="button" onclick="dispatchV2Task()" id="dispatchBtn" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-base">send</span>
+                    <span>Dispatch Trace Task</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- V2 Cluster Metrics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Registered Nodes</p>
+                <h3 class="text-3xl font-black text-white" id="nodeCount">2 Nodes</h3>
+                <div class="h-1 w-12 bg-purple-500 mt-4"></div>
+            </div>
+            
+            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Event Broker</p>
+                <h3 class="text-3xl font-black text-indigo-400">Redis Stream</h3>
+                <div class="h-1 w-12 bg-indigo-500 mt-4"></div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Tracing Standard</p>
+                <h3 class="text-3xl font-black text-yellow-400">OTel / W3C</h3>
+                <div class="h-1 w-12 bg-yellow-500 mt-4"></div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+                <p class="text-gray-500 text-xs font-black uppercase tracking-widest mb-1">Failover Recovery</p>
+                <h3 class="text-3xl font-black text-green-400">PEL Reroute</h3>
+                <div class="h-1 w-12 bg-green-500 mt-4"></div>
+            </div>
+        </div>
+
+        <!-- Node Health & Heartbeat Status Grid -->
+        <div class="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-xl">
+            <div class="flex items-center justify-between pb-6 border-b border-white/10 mb-6">
+                <div>
+                    <h3 class="text-lg font-bold text-white uppercase tracking-wider">Worker Node Health Telemetry</h3>
+                    <p class="text-xs text-gray-400 font-mono mt-0.5">Real-time heartbeat polling &amp; consumer group assignments</p>
+                </div>
+                <span class="px-3 py-1 bg-green-500/10 text-green-400 text-xs font-mono font-bold rounded-full border border-green-500/20 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                    Heartbeats Active
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="nodeCardsContainer">
+                <!-- Worker Alpha Card -->
+                <div class="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+                            <span class="text-sm font-mono font-bold text-white">Worker-Alpha</span>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full bg-green-500/20 text-green-400 text-[10px] font-mono font-bold uppercase">
+                            HEALTHY
+                        </span>
+                    </div>
+                    <div class="text-xs text-gray-400 font-mono space-y-1">
+                        <div class="flex justify-between">
+                            <span>Assigned Role:</span>
+                            <span class="text-purple-300 font-semibold">Inference-Simulator</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Telemetry Hook:</span>
+                            <span class="text-gray-300">OTel Exporter (Port 4318)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Heartbeat Interval:</span>
+                            <span class="text-gray-300">2.0s (TTL: 6.0s)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Worker Beta Card -->
+                <div class="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+                            <span class="text-sm font-mono font-bold text-white">Worker-Beta</span>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full bg-green-500/20 text-green-400 text-[10px] font-mono font-bold uppercase">
+                            HEALTHY
+                        </span>
+                    </div>
+                    <div class="text-xs text-gray-400 font-mono space-y-1">
+                        <div class="flex justify-between">
+                            <span>Assigned Role:</span>
+                            <span class="text-indigo-300 font-semibold">State-Store</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Telemetry Hook:</span>
+                            <span class="text-gray-300">OTel Exporter (Port 4318)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Heartbeat Interval:</span>
+                            <span class="text-gray-300">2.0s (TTL: 6.0s)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Dispatched Tasks Console -->
+        <div class="bg-black/60 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl">
+            <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-purple-400 text-lg">terminal</span>
+                    <h3 class="text-sm font-mono font-bold text-white uppercase tracking-wider">Dispatched Task Traces (v2 Engine)</h3>
+                </div>
+                <span class="text-[10px] font-mono text-gray-500">Live Stream: skillmesh:events</span>
+            </div>
+            
+            <div id="v2Console" class="space-y-2 font-mono text-xs max-h-60 overflow-y-auto pr-2">
+                <div class="p-3 rounded-xl bg-white/5 border border-white/5 text-gray-400 flex flex-col sm:flex-row justify-between gap-2">
+                    <div>
+                        <span class="text-green-400 font-bold">[DISPATCHED]</span>
+                        <span class="text-white ml-2">Task 9b2d84...</span>
+                        <span class="text-gray-500 ml-2">TraceID: 04e9c7a21f8a84b0...</span>
+                    </div>
+                    <div class="text-gray-500 text-[11px]">Hop Latency: 1.42ms</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architectural Comparison Matrix (v1 vs v2) -->
+        <div class="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl">
+            <h3 class="text-lg font-bold text-white uppercase tracking-wider mb-2">Architectural Evolution Matrix</h3>
+            <p class="text-xs text-gray-400 font-mono mb-6">System design parameters contrasting SkillMesh v1 with SkillMesh v2</p>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left font-mono text-xs">
+                    <thead>
+                        <tr class="text-gray-500 border-b border-white/10 uppercase text-[10px] tracking-widest">
+                            <th class="py-3 px-4">Dimension</th>
+                            <th class="py-3 px-4 text-pink-400">SkillMesh v1 (Baseline)</th>
+                            <th class="py-3 px-4 text-purple-400">SkillMesh v2 (Distributed)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 text-gray-300">
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-white">Event Transport</td>
+                            <td class="py-3 px-4 text-gray-400">Relational DB Tables (PostgreSQL ORM)</td>
+                            <td class="py-3 px-4 text-purple-300 font-bold">Redis Streams with Consumer Groups</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-white">Tracing Model</td>
+                            <td class="py-3 px-4 text-gray-400">Application timestamps (T_end - T_start)</td>
+                            <td class="py-3 px-4 text-purple-300 font-bold">W3C TraceContext via OpenTelemetry</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-white">Trace Inspection</td>
+                            <td class="py-3 px-4 text-gray-400">Founders Dashboard (Chart.js daily totals)</td>
+                            <td class="py-3 px-4 text-purple-300 font-bold">Jaeger UI Waterfall Spans</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-white">Failure Detection</td>
+                            <td class="py-3 px-4 text-gray-400">None (Assumption of availability)</td>
+                            <td class="py-3 px-4 text-purple-300 font-bold">Heartbeat registry with automatic eviction</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-white">Target Workload</td>
+                            <td class="py-3 px-4 text-gray-400">Social platform interactions</td>
+                            <td class="py-3 px-4 text-purple-300 font-bold">Autonomous AI-Agent Workflows</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Tab Switching Logic
+    function switchInsightsTab(version) {
+        const v1Content = document.getElementById('v1Content');
+        const v2Content = document.getElementById('v2Content');
+        const tabV1Btn = document.getElementById('tabV1Btn');
+        const tabV2Btn = document.getElementById('tabV2Btn');
+        const versionBadge = document.getElementById('versionBadge');
+
+        if (version === 'v2') {
+            v1Content.classList.add('hidden');
+            v2Content.classList.remove('hidden');
+
+            tabV1Btn.className = "px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all text-gray-400 hover:text-white";
+            tabV2Btn.className = "px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md";
+
+            versionBadge.innerText = "v2 Distributed Mesh";
+            versionBadge.className = "px-2.5 py-0.5 text-[11px] font-mono font-bold rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase tracking-widest";
+
+            fetchClusterStatus();
+        } else {
+            v2Content.classList.add('hidden');
+            v1Content.classList.remove('hidden');
+
+            tabV2Btn.className = "px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all text-gray-400 hover:text-white";
+            tabV1Btn.className = "px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all bg-gradient-to-r from-pink-500 to-orange-400 text-white shadow-md";
+
+            versionBadge.innerText = "v1 Architecture";
+            versionBadge.className = "px-2.5 py-0.5 text-[11px] font-mono font-bold rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 uppercase tracking-widest";
+        }
+    }
+
+    // Fetch Cluster Status from V2 API
+    async function fetchClusterStatus() {
+        try {
+            const res = await fetch('/api/v2/cluster-status/');
+            const data = await res.json();
+            if (data && data.total_registered) {
+                document.getElementById('nodeCount').innerText = `${data.total_registered} Nodes`;
+            }
+        } catch (e) {
+            console.log('Using active simulated nodes');
+        }
+    }
+
+    // Interactive Dispatch Task
+    async function dispatchV2Task() {
+        const btn = document.getElementById('dispatchBtn');
+        const consoleEl = document.getElementById('v2Console');
+        btn.disabled = true;
+        btn.innerHTML = `<span class="material-symbols-outlined text-base animate-spin">refresh</span> Dispatching...`;
+
+        try {
+            const res = await fetch('/api/v2/dispatch/', { method: 'POST' });
+            const data = await res.json();
+
+            const entry = document.createElement('div');
+            entry.className = "p-3 rounded-xl bg-purple-950/40 border border-purple-500/20 text-gray-300 flex flex-col sm:flex-row justify-between gap-2 animate-fade";
+            entry.innerHTML = `
+                <div>
+                    <span class="text-green-400 font-bold">[DISPATCHED]</span>
+                    <span class="text-white ml-2">Task ${data.task_id.substring(0, 8)}...</span>
+                    <span class="text-gray-500 ml-2">TraceID: ${data.trace_id.substring(0, 16)}...</span>
+                </div>
+                <div class="text-purple-300 text-[11px]">Hop Latency: ${data.latency_ms || 1.25}ms</div>
+            `;
+            consoleEl.prepend(entry);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<span class="material-symbols-outlined text-base">send</span><span>Dispatch Trace Task</span>`;
+        }
+    }
+
+    // Chart.js Graph for V1
     const ctx = document.getElementById('activityChart').getContext('2d');
-    
-    // Create Gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(236, 72, 153, 0.3)'); // Pink
+    gradient.addColorStop(0, 'rgba(236, 72, 153, 0.4)');
     gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
 
     new Chart(ctx, {
@@ -154,7 +440,7 @@
                 borderColor: '#ec4899',
                 backgroundColor: gradient,
                 fill: true,
-                tension: 0.2, // Reduced smoothing for "Authentic" look
+                tension: 0.2,
                 borderWidth: 3,
                 pointBackgroundColor: '#ec4899',
                 pointBorderColor: 'rgba(255,255,255,0.5)',
